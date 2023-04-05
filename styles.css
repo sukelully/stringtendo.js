@@ -8,18 +8,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh; /* sets the height of the body to the full viewport height */
+  height: 100vh;
   font-family: 'Poppins', sans-serif;
   background-color: #f2f2f2;
 }
 
-#serial-messages-container {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-}
-
-#menu {
+#ks-settings {
   display: none;
   margin: 0 auto;
   text-align: center;
@@ -91,7 +85,7 @@ p {
   color: #777;
 }
 
-.button-container {
+.nav-menu {
   position: fixed;
   top: 0;
   width: 100%;

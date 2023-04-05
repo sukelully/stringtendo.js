@@ -11,11 +11,6 @@ var button_C= 0;
 var joy_X = 0;
 var joy_Y = 0;
 
-var avgAcc = 0;
-var x1;
-var y1;
-var z1;
-
 // Define a nunchuck class.
 class nunchuckApp {
   constructor() {
@@ -24,7 +19,6 @@ class nunchuckApp {
 
     // Instantiate pluckSynth.
     this.pluckSynth = new PluckSynth();
-    // this.StringSynth = new StringSynth2();
 
     // Initialise the serialHandler and start listening for incoming messages.
     serialHandler.init().then(() => {
@@ -58,18 +52,18 @@ class nunchuckApp {
         acc_Y = `${matches[2]}`;
         acc_Z = `${matches[3]}`;
         button_Z = `${matches[4]}`;
-        const button_C_value = `${matches[5]}`;
+        button_C = `${matches[5]}`;
         joy_X = `${matches[6]}`;
         joy_Y = `${matches[7]}`;
 
         // Check if button_C value has changed from 0 to 1.
-        if (this.button_C_state == 0 && button_C_value == 1) {
+        if (this.button_C_state == 0 && button_C == 1) {
           // Call pluckPlucky() if button_C has changed from 0 to 1.
           this.pluckSynth.playTest(joy_X, joy_Y);
         }
 
         // Update the button_C state.
-        this.button_C_state = button_C_value;
+        this.button_C_state = button_C;
 
         // Display the data.
         displayedData.innerText = newMessage; // Set the text of the list item to the new message.

@@ -121,8 +121,7 @@ class PluckSynth {
                 return; // Return early if a button or slider is clicked.
             }
             // this.playFreq(32.70); // Low C
-            // this.pluckString();
-            this.playFreq(this.chromaticScale['F+']);
+            this.pluckString();
         });
 
         // Audio context button event listener for starting the Tone.js audio context.
@@ -135,7 +134,7 @@ class PluckSynth {
         });
          // Toggle menu button event listener for showing/hiding the menu.
         this.toggleMenuButton = document.getElementById('toggle-menu-button').addEventListener('click', async () => {
-            this.toggleVisibility('menu');
+            this.toggleVisibility('ks-settings');
         });
     }
 
@@ -162,7 +161,7 @@ class PluckSynth {
         // Delay node adds 128 sample frames between output and input so without
         // compensation the delay is 128 / sampleRate longer than desired.
         // Issue solved with: https://stackoverflow.com/questions/13153078/web-audio-karplus-strong-string-synthesis
-        var detune = Math.random() * (131 - 129) + 129;         // Subtle out of tune effect.
+        var detune = Math.random() * (130.5 - 129.5) + 12.5;         // Subtle out of tune effect.
         var delayTime = (1 / frequency) - (detune / sampleRate);
         delayTime = delayTime.toFixed(6);
         this.delay.delayTime.value = delayTime;
