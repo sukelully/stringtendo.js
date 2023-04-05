@@ -161,7 +161,7 @@ class PluckSynth {
         // Delay node adds 128 sample frames between output and input so without
         // compensation the delay is 128 / sampleRate longer than desired.
         // Issue solved with: https://stackoverflow.com/questions/13153078/web-audio-karplus-strong-string-synthesis
-        var detune = Math.random() * (130.5 - 129.5) + 12.5;         // Subtle out of tune effect.
+        var detune = Math.random() * (130.5 - 129.5) + 129.5;         // Subtle out of tune effect.
         var delayTime = (1 / frequency) - (detune / sampleRate);
         delayTime = delayTime.toFixed(6);
         this.delay.delayTime.value = delayTime;
