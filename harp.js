@@ -63,18 +63,36 @@ class Harp {
             this.string1.pluckString();
         });
 
-        // Audio context button event listener for starting the Tone.js audio context.
+
+        // Start the Tone.js audio context.
         this.audioContextButton = document.getElementById('audio-context-button').addEventListener('click', async () => {
             await Tone.start();
             console.log('audio context started');
         });
+        // Chromatic scale test.
         this.scaleTestButton = document.getElementById('scale-test-button').addEventListener('click', () => {
             this.scaleTest();
         });
-         // Toggle menu button event listener for showing/hiding the menu.
+         // Show/hide the menu.
         this.toggleMenuButton = document.getElementById('toggle-menu-button').addEventListener('click', async () => {
             this.toggleVisibility('ks-settings');
         });
+        // Mute strings.
+        this.muteStringsButton = document.getElementById('mute-strings-button').addEventListener('click', () => {
+            this.muteStrings();
+        })
+    }
+
+    // Mutes all strings.
+    muteStrings() {
+        this.string1.muteString();
+        this.string2.muteString();
+        this.string3.muteString();
+        this.string4.muteString();
+        this.string5.muteString();
+        this.string6.muteString();
+        this.string7.muteString();
+        this.string8.muteString();
     }
 
     // Plays the chromatic scale.
@@ -126,7 +144,7 @@ class Harp {
     }
 
     // Plays notes with 
-    playTest(joy_X, joy_Y) {
+    playHarp(joy_X, joy_Y) {
         if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
             this.string1.playFreq(chromScale['C']);
         }

@@ -13,7 +13,7 @@ var joy_X = 0;
 var joy_Y = 0;
 
 // Define a nunchuck class.
-class nunchuckApp {
+class nunchuck {
   constructor() {
     // Get a reference to the container where serial messages will be displayed.
     this.serialMessagesContainer = document.getElementById('serial-messages-container');
@@ -57,8 +57,7 @@ class nunchuckApp {
         // Check if button_C value has changed from 0 to 1.
         if (this.button_C_state == 0 && button_C == 1) {
           // Call pluckPlucky() if button_C has changed from 0 to 1.
-          // this.harp.string1.pluckString();
-          harp.playTest(joy_X, joy_Y);
+          harp.playHarp(joy_X, joy_Y);
         }
 
         // Update the button_C state.
@@ -82,4 +81,4 @@ class nunchuckApp {
 }
 
 // Create a new instance of the WebSerialDemoApp class.
-const app = new nunchuckApp();
+const app = new nunchuck();

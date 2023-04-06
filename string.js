@@ -6,6 +6,7 @@ class String {
         this.isPlaying = false;                         // Used to keep track of this.noise state.
         this.noise = new Tone.Noise('pink');            // Pink noise for less high frequency 'shrill'.
         this.gain = new Tone.Gain(0.5);
+        this.outputGain = new Tone.Gain();
         // Might be better at the end of the signal chain - notch filter.
         this.noiseFilter = new Tone.Filter({            // Initial filter used to shape tone.
             frequency: 10000, 
@@ -26,6 +27,7 @@ class String {
         })
         this.output = new Tone.getDestination();
 
+
         // Routing.
         this.noise.connect(this.noiseFilter);
         this.noiseFilter.connect(this.gain);          
@@ -33,7 +35,17 @@ class String {
         this.gain.connect(this.delay);
         this.delay.connect(this.loopFilter);
         this.loopFilter.connect(this.delay);
-        this.loopFilter.connect(this.output);
+        this.loopFilter.connect(this.outputGain);
+        this.outputGain.connect(this.output);
+
+        // Attempt to fix initial issues.
+        // // Ramp output gain to 0 in 10ms.
+        // this.outputGain.gain.rampTo(0, 0.01);
+        // this.output.mute = true;
+
+        // // First pluck can be distorted so it is muted upon setup.
+        // this.pluckString();
+        // this.muteString();
 
         // Set up HTML elements and event listeners.
         this.dampSlider = document.getElementById('damp-slider');
@@ -59,6 +71,25 @@ class String {
             this.filterSliderOutput.innerHTML = this.filterSlider.value;
             this.noiseFilter.frequency.value = this.filterSlider.value;
         }
+    }
+
+    // Clears delay loop.
+    muteString() {
+        // Ramp output gain to 0 in 10ms.
+        this.outputGain.gain.rampTo(0, 0.01);
+
+        // Mute output and disconnect delay loop.
+        setTimeout(() => {
+            this.output.mute = true;
+            this.delay.disconnect();
+        }, 110);    // Lowest interval without pops.
+
+        // Reconnect and set output gain to 1 10ms after being disconnected.
+        setTimeout(() => {
+            this.delay.connect(this.loopFilter);
+            this.outputGain.gain.rampTo(1, 0.01);
+            this.output.mute = false;
+        }, 120);
     }
 
     // Creates a 2-7ms pink noise burst that is fed into the delay line and filter.

@@ -81,7 +81,6 @@ class PluckSynth {
             if (event.target.matches('button') || event.target.matches('input[type="range"]'))  {
                 return; // Return early if a button or slider is clicked.
             }
-            // this.playFreq(32.70); // Low C
             this.pluckString();
         });
 
