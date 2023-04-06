@@ -7,8 +7,8 @@
   <meta http-equiv='origin-trial' content='AiM0rMslVx2jumsJjQ144QeZTScNmGVMYzBuXoaMQwCd7UHWbQH8Rg20adCN7XWaTMai4HvsUIyx3+blPPiupwEAAABreyJvcmlnaW4iOiJodHRwczovL3VuamF2YXNjcmlwdGVyLXdlYi1zZXJpYWwtZXhhbXBsZS5nbGl0Y2gubWU6NDQzIiwiZmVhdHVyZSI6IlNlcmlhbCIsImV4cGlyeSI6MTU5Njk3OTA1NX0='>
   <link rel='preconnect' href='https://fonts.gstatic.com'>
   <link href='https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;1,100&display=swap' rel='stylesheet'>
-  <script src='https://tonejs.github.io/build/Tone.js'></script>
-  <!-- <script src='https://unpkg.com/tone'></script> -->
+  <script src='https://tonejs.github.io/build/Tone.js'></script> <!-- Two sources for redundancy -->
+  <script src='https://unpkg.com/tone'></script>
   <link rel='stylesheet' href='styles.css'>
 </head>
 <body>
@@ -35,7 +35,7 @@
       <div id='ks-settings' style='display:none;'>
         <h2>Karplus-Strong Parameter Sliders</h2>
         <p>Adjust the parameters below to create different sounds:</p>
-        <input type='range'min='50' max='6000' value='3000' class='slider' step ='5' id='damp-slider'>
+        <input type='range'min='250' max='6000' value='3000' class='slider' step ='5' id='damp-slider'>
         <p>Dampening: <span id='damp-value'></span></p>
         <input type='range' min='0.0001' max='0.03' value='0.005' class='slider' step ='0.0001' id='del-slider'>
         <p>Delay Time: <span id='del-value'></span></p>

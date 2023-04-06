@@ -1,6 +1,7 @@
 // Import serialHandler object and OscillatorController class.
 import { serialHandler } from './serialHandler.js';
-import { PluckSynth } from './pluckSynth.js';
+// import { PluckSynth } from './pluckSynth.js';
+import { harp } from './harp.js'
 
 // Global variables.
 var acc_X = 0;
@@ -16,9 +17,6 @@ class nunchuckApp {
   constructor() {
     // Get a reference to the container where serial messages will be displayed.
     this.serialMessagesContainer = document.getElementById('serial-messages-container');
-
-    // Instantiate pluckSynth.
-    this.pluckSynth = new PluckSynth();
 
     // Initialise the serialHandler and start listening for incoming messages.
     serialHandler.init().then(() => {
@@ -59,7 +57,8 @@ class nunchuckApp {
         // Check if button_C value has changed from 0 to 1.
         if (this.button_C_state == 0 && button_C == 1) {
           // Call pluckPlucky() if button_C has changed from 0 to 1.
-          this.pluckSynth.playTest(joy_X, joy_Y);
+          // this.harp.string1.pluckString();
+          harp.playTest(joy_X, joy_Y);
         }
 
         // Update the button_C state.
