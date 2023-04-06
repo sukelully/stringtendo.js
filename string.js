@@ -1,9 +1,9 @@
 class String {
     constructor(){
         // Define the chromatic scale as an object with note names and their corresponding frequencies.
-        
         // Initialise variables for the noise generator, gain, filters, and output nodes.
-        this.isPlaying = false;                         // Used to keep track of this.noise state.
+        this.isPlaying = false;
+        this.isConnected = true;
         this.noise = new Tone.Noise('pink');            // Pink noise for less high frequency 'shrill'.
         this.gain = new Tone.Gain(0.5);
         this.outputGain = new Tone.Gain();
@@ -66,21 +66,36 @@ class String {
         }, 120);
     }
 
-    // Creates a 2-7ms pink noise burst that is fed into the delay line and filter.
+    // Creates a 17-22ms pink noise burst that is fed into the delay line and filter.
+    // Longer than a traditional Karplus-Strong noise burst but there are issues with
+    // it not making it into the delay line otherwise.
     pluckString() {
         // Checks to see if this.noise is not already playing.
-        if (this.isPlaying == false) {
-            var randomInt = Math.floor(Math.random() * (8 - 2) ) + 2;
-            this.noise.start();
-            this.isPlaying = true;
-            
-            // Stop this.noise after 2-7ms.
-            setTimeout(() => {
-                this.noise.stop();
-                this.isPlaying = false;
-            }, randomInt);
-        }
+        const randomInt = Math.floor(Math.random() * (23 - 17) ) + 17;
+        this.noise.start();
+        
+        // Stop this.noise after 2-7ms.
+        setTimeout(() => {
+            this.noise.stop();
+        }, randomInt);
+        
     }
+
+    // // Creates a 2-7ms pink noise burst that is fed into the delay line and filter.
+    // pluckString() {
+    //     // Checks to see if this.noise is not already playing.
+    //     if (this.isPlaying == false) {
+    //         var randomInt = Math.floor(Math.random() * (8 - 2) ) + 2;
+    //         this.noise.start();
+    //         this.isPlaying = true;
+            
+    //         // Stop this.noise after 2-7ms.
+    //         setTimeout(() => {
+    //             this.noise.stop();
+    //             this.isPlaying = false;
+    //         }, randomInt);
+    //     }
+    // }
 
     // Plays the specified frequency.
     // Converts frequency to delay time.

@@ -110,7 +110,8 @@ class Nunchuck {
     // Check if button_C value has changed from 0 to 1.
     if (this.buttonC_state == 0 && buttonC == 1) {
       // Play note on harp if buttonC has changed from 0 to 1.
-      harp.playHarp(joyX, joyY);
+      const intensity = accAvgRoc * 50;
+      harp.playHarp(joyX, joyY, intensity);
       console.log(`accAvgRoc: ${accAvgRoc}`);
 
       // Resets rate of change values after string has been plucked

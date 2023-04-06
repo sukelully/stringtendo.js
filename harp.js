@@ -3,15 +3,14 @@ import { chromScale } from './notes.js';
 
 class Harp {
     constructor(){
-        // Set up strings.
-        this.string1 = new String();
-        this.string2 = new String();
-        this.string3 = new String();
-        this.string4 = new String();
-        this.string5 = new String();
-        this.string6 = new String();
-        this.string7 = new String();
-        this.string8 = new String();
+        // Create 8 strings for each note of the major scale + octave
+        // and duplicates of each to bypass filter instability.
+        for (let i = 1; i <= 8; i++) {
+            this[`string${i}`] = new String();
+            this[`string${i}b`] = new String();
+
+            this[`string${i}b`].isConnected = false;
+        }
 
         // Set up HTML elements and event listeners.
         this.dampSlider = document.getElementById('damp-slider');
@@ -49,7 +48,6 @@ class Harp {
         this.dampSlider.addEventListener('mousedown', (event) => {
             if (event.currentTarget === this.dampSlider) {
                 // Disconnect loopFilter node is damp slider is adjusted.
-                // this.string1.loopFilter.disconnect();
                 for (let i = 1; i <= 8; i++) {
                     this[`string${i}`].loopFilter.disconnect();
                 }
@@ -61,8 +59,6 @@ class Harp {
         });
         // Reconnect node upon mouseup event.
         this.dampSlider.addEventListener('mouseup', (event) => {
-            // this.string1.loopFilter.connect(this.string1.delay);
-            // this.string1.loopFilter.connect(this.string1.output);
             for (let i = 1; i <= 8; i++) {
                 this[`string${i}`].loopFilter.connect(this[`string${i}`].delay);
                 this[`string${i}`].loopFilter.connect(this[`string${i}`].output);
@@ -96,16 +92,128 @@ class Harp {
         })
     }
 
+    changeFilterFreq(string, freq) {
+        this[`string${string}`].loopFilter.disconnect();
+        this[`string${string}`].loopFilter.frequency.value = freq;
+    }
+
+    disconnectFilter(string) {
+        this[`string${string}`].outputGain.gain.rampTo(0, 0.01);
+        this[`string${string}`].loopFilter.disconnect();
+    }
+
+    reconnectFilter(string) {
+        this[`string${string}`].loopFilter.connect(this[`string${string}`].delay);
+        this[`string${string}`].loopFilter.connect(this[`string${string}`].output);
+    }
+
     // Mutes all strings.
     muteStrings() {
-        this.string1.muteString();
-        this.string2.muteString();
-        this.string3.muteString();
-        this.string4.muteString();
-        this.string5.muteString();
-        this.string6.muteString();
-        this.string7.muteString();
-        this.string8.muteString();
+        for (let i = 1; i <= 8; i++) {
+            this[`string${i}`].muteString();
+            this[`string${i}b`].muteString();
+        }
+    }
+
+    // if (this.string1.isPlaying == false) {
+    //     console.log("string1");
+    //     if (this.string1b.isConnected) {
+    //       this.disconnectFilter("1b");
+    //       this.string1b.isConnected = false;
+    //     }
+    //     // this.string1.loopFilter.frequency = intenstiy;
+    //     this.string1.loopFilter.frequency = randomIntensity;
+    //     if (!this.string1.isConnected) {
+    //         this.reconnectFilter("1");
+    //         this.string1.isConnected = true;
+    //     }
+    //     setTimeout(() => {
+    //         this.string1.playFreq(chromScale['C']);
+    //         this.string1b.isPlaying = false;
+    //         this.string1.isPlaying = true;
+    //     }, 10);
+    //   } else {
+    //     console.log("string1b");
+    //     if (this.string1.isConnected) {
+    //       this.disconnectFilter("1");
+    //       this.string1.isConnected = false;
+    //     }
+    //     // this.string1b.loopFilter.frequency = intenstiy;
+    //     this.string1b.loopFilter.frequency = randomIntensity;
+    //     if (!this.string1b.isConnected) {
+    //         this.reconnectFilter("1b");
+    //         this.string1b.isConnected = true;
+    //     }
+    //     setTimeout(() => {
+    //         this.string1b.playFreq(chromScale['C']);
+    //         this.string1.isPlaying = false;
+    //         this.string1b.isPlaying = true;
+    //     }, 10);
+    //   }
+
+    swapString(stringA, stringB, note) {
+        var randomIntensity = Math.floor(Math.random() * (6000 - 2000) ) + 2000;
+        if (this[`string${stringA}`].isPlaying == false) {
+            if (this[`string${stringB}`].isConnected) {
+              this.disconnectFilter(stringB);
+              this[`string${stringB}`].isConnected = false;
+            }
+            // this.string1.loopFilter.frequency = intenstiy;
+            this[`string${stringA}`].loopFilter.frequency = randomIntensity;
+            if (!this[`string${stringA}`].isConnected) {
+                this.reconnectFilter(stringA);
+                this[`string${stringA}`].isConnected = true;
+            }
+            setTimeout(() => {
+                this[`string${stringA}`].playFreq(chromScale[note]);
+                this[`string${stringB}`].isPlaying = false;
+                this[`string${stringA}`].isPlaying = true;
+            }, 5);
+          } else {
+            if (this[`string${stringA}`].isConnected) {
+              this.disconnectFilter(stringA);
+              this[`string${stringA}`].isConnected = false;
+            }
+            // this.string1b.loopFilter.frequency = intenstiy;
+            this[`string${stringB}`].loopFilter.frequency = randomIntensity;
+            if (!this[`string${stringB}`].isConnected) {
+                this.reconnectFilter(stringB);
+                this[`string${stringB}`].isConnected = true;
+            }
+            setTimeout(() => {
+                this[`string${stringB}`].playFreq(chromScale[note]);
+                this[`string${stringA}`].isPlaying = false;
+                this[`string${stringB}`].isPlaying = true;
+            }, 5);
+          }
+    }
+
+    // Plays notes with 
+    playHarp(joy_X, joy_Y, intenstiy) {
+        if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
+            this.swapString('1', '1b', 'C');                                     
+        }
+        if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
+            this.swapString('2', '2b', 'D');  
+        }
+        if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
+            this.swapString('3', '3b', 'E'); 
+        }
+        if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
+            this.swapString('4', '4b', 'F'); 
+        }
+        if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
+            this.swapString('5', '5b', 'G'); 
+        }
+        if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
+            this.swapString('6', '6b', 'A'); 
+        }
+        if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
+            this.swapString('7', '7b', 'B'); 
+        }
+        if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
+            this.swapString('8', '8b', 'C+');
+        }
     }
 
     // Plays the chromatic scale.
@@ -154,34 +262,6 @@ class Harp {
     toggleVisibility(id) {
         var element = document.getElementById(id);
         element.style.display = (element.style.display == 'block') ? 'none' : 'block';
-    }
-
-    // Plays notes with 
-    playHarp(joy_X, joy_Y) {
-        if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
-            this.string1.playFreq(chromScale['C']);
-        }
-        if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
-            this.string2.playFreq(chromScale['D']);
-        }
-        if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
-            this.string3.playFreq(chromScale['E']);
-        }
-        if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
-            this.string4.playFreq(chromScale['F']);
-        }
-        if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
-            this.string5.playFreq(chromScale['G']);
-        }
-        if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
-            this.string6.playFreq(chromScale['A']);
-        }
-        if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
-            this.string7.playFreq(chromScale['B']);
-        }
-        if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
-            this.string8.playFreq(chromScale['C+']);
-        }
     }
 }
 
