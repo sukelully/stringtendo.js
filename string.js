@@ -17,7 +17,7 @@ class String {
             maxDelay: 1
         }); 
         this.loopFilter = new Tone.OnePoleFilter({
-            frequency: 2000, 
+            frequency: 2000,                            // Dampening.
             type: 'lowpass'
         });
         // Try and make changing dampening variable better.
@@ -26,7 +26,6 @@ class String {
             type: 'lowpass'
         })
         this.output = new Tone.getDestination();
-
 
         // Routing.
         this.noise.connect(this.noiseFilter);

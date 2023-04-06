@@ -13,53 +13,11 @@ class Harp {
         this.string7 = new String();
         this.string8 = new String();
 
-        // Set up HTML elements and event listeners.
-        this.dampSlider = document.getElementById('damp-slider');
-        this.dampSliderOutput = document.getElementById('damp-value');
-        this.dampSliderOutput.innerHTML = this.dampSlider.value;
-        this.delSlider = document.getElementById('del-slider');
-        this.delSliderOutput = document.getElementById('del-value');
-        this.delSliderOutput.innerHTML = this.delSlider.value;
-        this.filterSlider = document.getElementById('filter-slider');
-        this.filterSliderOutput = document.getElementById('filter-value');
-        this.filterSliderOutput.innerHTML = this.filterSlider.value;
-
-        // Set event listeners to update filter frequency and delay time when sliders are adjusted.
-        this.dampSlider.oninput = () => {
-            this.dampSliderOutput.innerHTML = this.dampSlider.value;
-            this.loopFilter.frequency = this.dampSlider.value;
-        }
-        this.delSlider.oninput = () => {
-            this.delSliderOutput.innerHTML = this.delSlider.value;
-            this.delay.delayTime.value = this.delSlider.value;
-        }
-        this.filterSlider.oninput = () => {
-            this.filterSliderOutput.innerHTML = this.filterSlider.value;
-            this.noiseFilter.frequency.value = this.filterSlider.value;
-        }
-        
-        // OnePoleFilter node is unstable when frequency is adjusted so it must be disconnected first.
-        // Set up event listeners for damp slider mousedown and mouseup events to do so.
-        this.dampSlider.addEventListener('mousedown', (event) => {
-            if (event.currentTarget === this.dampSlider) {
-                // Disconnect loopFilter node is damp slider is adjusted.
-                this.loopFilter.disconnect();
-            }
-            this.loopFilter.frequency = this.dampSlider.value;
-        });
-
-        // Reconnect node upon mouseup event.
-        this.dampSlider.addEventListener('mouseup', (event) => {
-            this.loopFilter.connect(this.delay);
-            this.loopFilter.connect(this.output);
-        });
-
         // Event listener to play a note when clicking outside of buttons and sliders.
         document.addEventListener('mousedown', (event) => {
             if (event.target.matches('button') || event.target.matches('input[type="range"]'))  {
                 return; // Return early if a button or slider is clicked.
             }
-
             this.string1.pluckString();
         });
 

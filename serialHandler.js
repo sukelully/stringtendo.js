@@ -63,6 +63,6 @@ class SerialHandler {
   }
 }
 
-// Create new SerialHandler object and export for use in main module.
+// Instantiate and export.
 const serialHandler = new SerialHandler();
 export { serialHandler };
