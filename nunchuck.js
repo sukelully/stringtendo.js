@@ -67,6 +67,7 @@ class Nunchuck {
         joyX = `${matches[6]}`;
         joyY = `${matches[7]}`;
 
+        // Get initial values every 100ms.
         setTimeout(() => {
           initialAccX = accX;
           initialAccY = accY;

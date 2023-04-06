@@ -45,31 +45,6 @@ class String {
         // // First pluck can be distorted so it is muted upon setup.
         // this.pluckString();
         // this.muteString();
-
-        // Set up HTML elements and event listeners.
-        this.dampSlider = document.getElementById('damp-slider');
-        this.dampSliderOutput = document.getElementById('damp-value');
-        this.dampSliderOutput.innerHTML = this.dampSlider.value;
-        this.delSlider = document.getElementById('del-slider');
-        this.delSliderOutput = document.getElementById('del-value');
-        this.delSliderOutput.innerHTML = this.delSlider.value;
-        this.filterSlider = document.getElementById('filter-slider');
-        this.filterSliderOutput = document.getElementById('filter-value');
-        this.filterSliderOutput.innerHTML = this.filterSlider.value;
-
-        // Set event listeners to update filter frequency and delay time when sliders are adjusted.
-        this.dampSlider.oninput = () => {
-            this.dampSliderOutput.innerHTML = this.dampSlider.value;
-            this.loopFilter.frequency = this.dampSlider.value;
-        }
-        this.delSlider.oninput = () => {
-            this.delSliderOutput.innerHTML = this.delSlider.value;
-            this.delay.delayTime.value = this.delSlider.value;
-        }
-        this.filterSlider.oninput = () => {
-            this.filterSliderOutput.innerHTML = this.filterSlider.value;
-            this.noiseFilter.frequency.value = this.filterSlider.value;
-        }
     }
 
     // Clears delay loop.
