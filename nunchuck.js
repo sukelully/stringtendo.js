@@ -105,12 +105,22 @@ class Nunchuck {
     }
   }
 
+  scaleIntensity(x) {
+    // const m = (7000 - 1000) / (300 - 1);
+    // const c = 1000 - m * 1;
+    // return m * x + c;
+    return x * 2;
+  }
+
   // C button is pressed.
   pressButtonC() {
     // Check if button_C value has changed from 0 to 1.
     if (this.buttonC_state == 0 && buttonC == 1) {
       // Play note on harp if buttonC has changed from 0 to 1.
-      const intensity = accAvgRoc * 50;
+      // const intensity = scaleIntensity(accAvgRoc);
+      const m = (7000 - 1000) / (300 - 1);
+      const c = 1000 - m * 1;
+      const intensity =  m * accAvgRoc + c;
       harp.playHarp(joyX, joyY, intensity);
       console.log(`accAvgRoc: ${accAvgRoc}`);
 

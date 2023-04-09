@@ -10,7 +10,8 @@ class String {
         // Might be better at the end of the signal chain - notch filter.
         this.noiseFilter = new Tone.Filter({            // Initial filter used to shape tone.
             frequency: 10000, 
-            type: 'lowpass'
+            type: 'lowpass',
+            Q: 1
         });
         this.delay = new Tone.Delay({
             delayTime: 0.01, 
@@ -81,22 +82,6 @@ class String {
         
     }
 
-    // // Creates a 2-7ms pink noise burst that is fed into the delay line and filter.
-    // pluckString() {
-    //     // Checks to see if this.noise is not already playing.
-    //     if (this.isPlaying == false) {
-    //         var randomInt = Math.floor(Math.random() * (8 - 2) ) + 2;
-    //         this.noise.start();
-    //         this.isPlaying = true;
-            
-    //         // Stop this.noise after 2-7ms.
-    //         setTimeout(() => {
-    //             this.noise.stop();
-    //             this.isPlaying = false;
-    //         }, randomInt);
-    //     }
-    // }
-
     // Plays the specified frequency.
     // Converts frequency to delay time.
     playFreq(frequency) {
@@ -105,7 +90,7 @@ class String {
         // compensation the delay is 128 / sampleRate longer than desired.
         // Issue solved with: https://stackoverflow.com/questions/13153078/web-audio-karplus-strong-string-synthesis
         var detune = Math.random() * (130.5 - 129.5) + 129.5;         // Subtle out of tune effect.
-        var delayTime = (1 / frequency) - (detune / sampleRate);
+        var delayTime = (1 / frequency) - (130 / sampleRate);
         delayTime = delayTime.toFixed(6);
         this.delay.delayTime.value = delayTime;
         this.pluckString();

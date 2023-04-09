@@ -28,18 +28,21 @@ class Harp {
             this.dampSliderOutput.innerHTML = this.dampSlider.value;
             for (let i = 1; i <= 8; i++) {
                 this[`string${i}`].loopFilter.frequency = this.dampSlider.value;
+                this[`string${i}b`].loopFilter.frequency = this.dampSlider.value;
             }
         }
         this.delSlider.oninput = () => {
             this.delSliderOutput.innerHTML = this.delSlider.value;
             for (let i = 1; i <= 8; i++) {
                 this[`string${i}`].delay.delayTime.value = this.delSlider.value;
+                this[`string${i}b`].delay.delayTime.value = this.delSlider.value;
             }
         }
         this.filterSlider.oninput = () => {
             this.filterSliderOutput.innerHTML = this.filterSlider.value;
             for (let i = 1; i <= 8; i++) {
                 this[`string${i}`].noiseFilter.frequency.value = this.filterSlider.value;
+                this[`string${i}b`].noiseFilter.frequency.value = this.filterSlider.value;
             }
         }
 
@@ -115,51 +118,18 @@ class Harp {
         }
     }
 
-    // if (this.string1.isPlaying == false) {
-    //     console.log("string1");
-    //     if (this.string1b.isConnected) {
-    //       this.disconnectFilter("1b");
-    //       this.string1b.isConnected = false;
-    //     }
-    //     // this.string1.loopFilter.frequency = intenstiy;
-    //     this.string1.loopFilter.frequency = randomIntensity;
-    //     if (!this.string1.isConnected) {
-    //         this.reconnectFilter("1");
-    //         this.string1.isConnected = true;
-    //     }
-    //     setTimeout(() => {
-    //         this.string1.playFreq(chromScale['C']);
-    //         this.string1b.isPlaying = false;
-    //         this.string1.isPlaying = true;
-    //     }, 10);
-    //   } else {
-    //     console.log("string1b");
-    //     if (this.string1.isConnected) {
-    //       this.disconnectFilter("1");
-    //       this.string1.isConnected = false;
-    //     }
-    //     // this.string1b.loopFilter.frequency = intenstiy;
-    //     this.string1b.loopFilter.frequency = randomIntensity;
-    //     if (!this.string1b.isConnected) {
-    //         this.reconnectFilter("1b");
-    //         this.string1b.isConnected = true;
-    //     }
-    //     setTimeout(() => {
-    //         this.string1b.playFreq(chromScale['C']);
-    //         this.string1.isPlaying = false;
-    //         this.string1b.isPlaying = true;
-    //     }, 10);
-    //   }
-
-    swapString(stringA, stringB, note) {
+    swapString(stringA, stringB, note, intensity) {
         var randomIntensity = Math.floor(Math.random() * (6000 - 2000) ) + 2000;
         if (this[`string${stringA}`].isPlaying == false) {
             if (this[`string${stringB}`].isConnected) {
-              this.disconnectFilter(stringB);
-              this[`string${stringB}`].isConnected = false;
+                this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
+                setTimeout(() => {
+                    this.disconnectFilter(stringB);
+                    this[`string${stringB}`].isConnected = false;
+                }, 110);
             }
             // this.string1.loopFilter.frequency = intenstiy;
-            this[`string${stringA}`].loopFilter.frequency = randomIntensity;
+            this[`string${stringA}`].loopFilter.frequency = intensity;
             if (!this[`string${stringA}`].isConnected) {
                 this.reconnectFilter(stringA);
                 this[`string${stringA}`].isConnected = true;
@@ -171,11 +141,14 @@ class Harp {
             }, 5);
           } else {
             if (this[`string${stringA}`].isConnected) {
-              this.disconnectFilter(stringA);
-              this[`string${stringA}`].isConnected = false;
+                this[`string${stringA}`].outputGain.gain.rampTo(0, 0.01);
+                setTimeout(() => {
+                    this.disconnectFilter(stringA);
+                    this[`string${stringA}`].isConnected = false;
+                }, 110);
             }
             // this.string1b.loopFilter.frequency = intenstiy;
-            this[`string${stringB}`].loopFilter.frequency = randomIntensity;
+            this[`string${stringB}`].loopFilter.frequency = intensity;
             if (!this[`string${stringB}`].isConnected) {
                 this.reconnectFilter(stringB);
                 this[`string${stringB}`].isConnected = true;
@@ -189,72 +162,43 @@ class Harp {
     }
 
     // Plays notes with 
-    playHarp(joy_X, joy_Y, intenstiy) {
+    playHarp(joy_X, joy_Y, intensity) {
         if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
-            this.swapString('1', '1b', 'C');                                     
+            this.swapString('1', '1b', 'C', intensity);                                     
         }
         if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
-            this.swapString('2', '2b', 'D');  
+            this.swapString('2', '2b', 'D', intensity);  
         }
         if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
-            this.swapString('3', '3b', 'E'); 
+            this.swapString('3', '3b', 'E', intensity); 
         }
         if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
-            this.swapString('4', '4b', 'F'); 
+            this.swapString('4', '4b', 'F', intensity); 
         }
         if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
-            this.swapString('5', '5b', 'G'); 
+            this.swapString('5', '5b', 'G', intensity); 
         }
         if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
-            this.swapString('6', '6b', 'A'); 
+            this.swapString('6', '6b', 'A', intensity); 
         }
         if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
-            this.swapString('7', '7b', 'B'); 
+            this.swapString('7', '7b', 'B', intensity); 
         }
         if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
-            this.swapString('8', '8b', 'C+');
+            this.swapString('8', '8b', 'C+', intensity);
         }
     }
 
     // Plays the chromatic scale.
     scaleTest() {
-        this.string1.playFreq(chromScale['C']);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['Db']);
-        }, 250);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['D']);
-        }, 500);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['Eb']);
-        }, 750);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['E']);
-        }, 1000);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['F']);
-        }, 1250);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['Gb']);
-        }, 1500);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['G']);
-        }, 1750);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['Ab']);
-        }, 2000);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['A']);
-        }, 2250);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['Bb']);
-        }, 2500);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['B']);
-        }, 2750);
-        setTimeout(() => {
-            this.string1.playFreq(chromScale['C+']);
-        }, 3000);
+        const notes = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B', 'C+'];
+        let time = 0;
+        notes.forEach(note => {
+          setTimeout(() => {
+            this.string1.playFreq(chromScale[note]);
+          }, time);
+          time += 250;
+        });
     }
 
     // Show/hides HTML an element.
