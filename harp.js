@@ -73,7 +73,8 @@ class Harp {
             if (event.target.matches('button') || event.target.matches('input[type="range"]'))  {
                 return; // Return early if a button or slider is clicked.
             }
-            this.string1.playFreq(chromScale['C4']);
+            // this.string1.playFreq(chromScale['Gb4']);
+            this.string1.pluckString();
         });
 
         // Start the Tone.js audio context.
@@ -119,7 +120,6 @@ class Harp {
     }
 
     swapString(stringA, stringB, note, intensity) {
-        var randomIntensity = Math.floor(Math.random() * (6000 - 2000) ) + 2000;
         if (this[`string${stringA}`].isPlaying == false) {
             if (this[`string${stringB}`].isConnected) {
                 this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
@@ -128,8 +128,8 @@ class Harp {
                     this[`string${stringB}`].isConnected = false;
                 }, 110);
             }
-            // this.string1.loopFilter.frequency = intenstiy;
             this[`string${stringA}`].loopFilter.frequency = intensity;
+            // this[`string${stringA}`].loopFilter.frequency = 6000;
             if (!this[`string${stringA}`].isConnected) {
                 this.reconnectFilter(stringA);
                 this[`string${stringA}`].isConnected = true;
@@ -147,8 +147,8 @@ class Harp {
                     this[`string${stringA}`].isConnected = false;
                 }, 110);
             }
-            // this.string1b.loopFilter.frequency = intenstiy;
             this[`string${stringB}`].loopFilter.frequency = intensity;
+            // this[`string${stringB}`].loopFilter.frequency = 6000;
             if (!this[`string${stringB}`].isConnected) {
                 this.reconnectFilter(stringB);
                 this[`string${stringB}`].isConnected = true;
@@ -164,7 +164,7 @@ class Harp {
     // Plays notes with 
     playHarp(joy_X, joy_Y, intensity) {
         if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
-            this.swapString('1', '1b', 'C3', intensity);                                     
+            this.swapString('1', '1b', 'C2', intensity);                                     
         }
         if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
             this.swapString('2', '2b', 'D3', intensity);  
@@ -185,7 +185,7 @@ class Harp {
             this.swapString('7', '7b', 'B3', intensity); 
         }
         if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
-            this.swapString('8', '8b', 'C5', intensity);
+            this.swapString('8', '8b', 'C4', intensity);
         }
     }
 

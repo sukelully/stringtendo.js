@@ -7,6 +7,10 @@ class String {
         this.noise = new Tone.Noise('pink');            // Pink noise for less high frequency 'shrill'.
         this.gain = new Tone.Gain(0.5);
         this.outputGain = new Tone.Gain();
+        this.synth = new Tone.Synth().toDestination();
+
+        //play a middle 'C' for the duration of an 8th note
+        // this.synth.triggerAttack("F1");
         // Might be better at the end of the signal chain - notch filter.
         this.noiseFilter = new Tone.Filter({            // Initial filter used to shape tone.
             frequency: 10000, 
@@ -14,7 +18,7 @@ class String {
             Q: 1
         });
         this.delay = new Tone.Delay({
-            delayTime: 0.01, 
+            delayTime: 0.000865, 
             maxDelay: 1
         }); 
         this.loopFilter = new Tone.OnePoleFilter({
@@ -94,30 +98,63 @@ class String {
 
     // 0.0005 = ~315Hz
     // 0.0001 = ~365Hz
-    // 0.00005 = 368Hz
-    // F#4 = 369Hz
+    // 0.000049 = 370Hz
+    // F#4 = 369.99Hz
     // 0.00001 = ~375Hz  // Highest possible note.
 
-    // Middle C3 (130.81Hz) tests.
-    // (150/SR) = ~137Hz
-    // (138/SR) = ~132.2Hz
-    // (134/SR) = ~131Hz
-    // (132/SR) = 129.3Hz
-    // (130/SR) = 129.3Hz
-    // (128/SR) = 128.6Hz
 
-    // C4 (263.74Hz) tests.
-    // (134/SR) = ~263Hz.
+    // C1 = 32.7Hz
+    // 0.02763 = 32.7
+
+    // F1 = 43.65Hz
+    // 0.02 = 43.7Hz
+    // (142.05635738/SR) = 43.65Hz
+
+    // C2 = 65.41Hz
+    // 0.01234 = 65.4Hz
+    // (141.51274728/SR) = 65.4Hz
+
+    // Middle C3 (130.81Hz) tests.
+    // (134/SR) = ~131Hz        // Accurate.
+
+    // C4 (261.63Hz) tests.
+    // 0.000865 = 261.5Hz
+    // (142.03640535/SR) = 261.5Hz
+    // (130/SR) = ~262Hz        // Accurate.
+
+
+    // Gb4 (369.99Hz) tests (Highest possible note - lowest delay time possible is 0.00005);
+    // (127.38123603/SR) = ~370Hz   //Accurate.
+
+    // 6000 intensity = 128 delayComp
+    // 4000 intensity = 128.5 delayComp
+    // 2000 intensity = 130 delayComp
+    // 1000 intensity = 134 delayComp
+
+    // loopFilter.frequency affects pitch for an unknown reason.
+    // Returns a value that is used to calculate the necessary delay time
+    // for the input pitch.
+    calcDelayComp(intensity) {
+        if (intensity >= 6000) {
+          return 128;
+        } else if (intensity >= 4000) {
+          return 128.5 - 0.00025 * (intensity - 4000);
+        } else if (intensity >= 2000) {
+          return 130 - 0.000125 * (intensity - 2000);
+        } else if (intensity >= 1000) {
+          return 134 - 0.0001 * (intensity - 1000);
+        } else {
+          return null; // or some other default value or error handling
+        }
+      }
 
     // // Plays the specified frequency.
     // // Converts frequency to delay time.
     playFreq(frequency) {
-        const sampleRate = Tone.context.sampleRate;
-        // Delay node adds 128 sample frames between output and input so without
-        // compensation the delay is 128 / sampleRate longer than desired.
-        // However, using 134 yields more accurate pitch.
-        var delayTime = (1 / frequency) - (134 / sampleRate);
-        delayTime = delayTime.toFixed(6);
+        const intensity = this.loopFilter.frequency;
+        const delayComp = this.calcDelayComp(intensity);
+        const delayTime = (1 / frequency) - (delayComp / sampleRate);
+        // delayTime = delayTime.toFixed(6);
         this.delay.delayTime.value = delayTime;
         this.pluckString();
     }
