@@ -141,10 +141,10 @@ class String {
           return 128.5 - 0.00025 * (intensity - 4000);
         } else if (intensity >= 2000) {
           return 130 - 0.000125 * (intensity - 2000);
-        } else if (intensity >= 1000) {
+        } else if (intensity >= 500) {
           return 134 - 0.0001 * (intensity - 1000);
         } else {
-          return null; // or some other default value or error handling
+          return 140
         }
       }
 
@@ -153,6 +153,7 @@ class String {
     playFreq(frequency) {
         const intensity = this.loopFilter.frequency;
         const delayComp = this.calcDelayComp(intensity);
+        const sampleRate = Tone.context.sampleRate;
         const delayTime = (1 / frequency) - (delayComp / sampleRate);
         // delayTime = delayTime.toFixed(6);
         this.delay.delayTime.value = delayTime;

@@ -72,7 +72,7 @@ class Nunchuck {
           initialAccX = accX;
           initialAccY = accY;
           initialAccZ = accZ;
-        }, 100);
+        }, 300);
 
         // Calculate the rate of change of all three accelerometer values over 100ms.
         setTimeout(() => {
@@ -83,7 +83,7 @@ class Nunchuck {
           accY_RoC = (finalAccY - initialAccY);   if (accY_RoC < 0 ) accY_RoC *= -1;
           accZ_RoC = (finalAccZ - initialAccZ);   if (accZ_RoC < 0 ) accZ_RoC *= -1;
           accAvgRoc = (accX_RoC + accY_RoC + accZ_RoC) / 3;
-          timeIntervalRoC = 100;
+          timeIntervalRoC = 300;
         }, timeIntervalRoC);
 
         // C button is pressed.

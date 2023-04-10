@@ -120,6 +120,10 @@ class Harp {
     }
 
     swapString(stringA, stringB, note, intensity) {
+        // Keeps filter frequency in a suitable range.
+        if (intensity < 1000) intensity = 1000;
+        if (intensity > 7000) intensity = 7000;
+        console.log(intensity);
         if (this[`string${stringA}`].isPlaying == false) {
             if (this[`string${stringB}`].isConnected) {
                 this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
@@ -129,7 +133,6 @@ class Harp {
                 }, 110);
             }
             this[`string${stringA}`].loopFilter.frequency = intensity;
-            // this[`string${stringA}`].loopFilter.frequency = 6000;
             if (!this[`string${stringA}`].isConnected) {
                 this.reconnectFilter(stringA);
                 this[`string${stringA}`].isConnected = true;
@@ -148,7 +151,6 @@ class Harp {
                 }, 110);
             }
             this[`string${stringB}`].loopFilter.frequency = intensity;
-            // this[`string${stringB}`].loopFilter.frequency = 6000;
             if (!this[`string${stringB}`].isConnected) {
                 this.reconnectFilter(stringB);
                 this[`string${stringB}`].isConnected = true;
@@ -164,28 +166,28 @@ class Harp {
     // Plays notes with 
     playHarp(joy_X, joy_Y, intensity) {
         if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
-            this.swapString('1', '1b', 'C2', intensity);                                     
+            this.swapString('1', '1b', 'C3', intensity);                                     
         }
         if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
-            this.swapString('2', '2b', 'D3', intensity);  
+            this.swapString('2', '2b', 'D3', intensity*1.1);  
         }
         if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
-            this.swapString('3', '3b', 'E3', intensity); 
+            this.swapString('3', '3b', 'E3', intensity*1.2); 
         }
         if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
-            this.swapString('4', '4b', 'F3', intensity); 
+            this.swapString('4', '4b', 'F3', intensity*1.3); 
         }
         if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
-            this.swapString('5', '5b', 'G3', intensity); 
+            this.swapString('5', '5b', 'G3', intensity*1.4); 
         }
         if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
-            this.swapString('6', '6b', 'A3', intensity); 
+            this.swapString('6', '6b', 'A3', intensity*1.5); 
         }
         if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
-            this.swapString('7', '7b', 'B3', intensity); 
+            this.swapString('7', '7b', 'B3', intensity*1.6); 
         }
         if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
-            this.swapString('8', '8b', 'C4', intensity);
+            this.swapString('8', '8b', 'C4', intensity*1.7);
         }
     }
 
