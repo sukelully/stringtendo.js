@@ -1,6 +1,6 @@
 // Import serialHandler and harp objects.
-import { serialHandler } from './serialHandler.js';
-import { harp } from './harp.js'
+import { serialHandler } from '/js/serialHandler.js';
+import { harp } from '/js/harp.js'
 
 // Controller variables.
 var accX = 0;

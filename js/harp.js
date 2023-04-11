@@ -1,5 +1,5 @@
-import { String } from './string.js'
-import { chromScale } from './notes.js';
+import { String } from '/js/string3.js';
+import { chromScale } from '/js/notes.js';
 
 class Harp {
     constructor(){
@@ -119,6 +119,50 @@ class Harp {
         }
     }
 
+    // swapString(stringA, stringB, note, intensity) {
+    //     // Keeps filter frequency in a suitable range.
+    //     if (intensity < 1000) intensity = 1000;
+    //     if (intensity > 7000) intensity = 7000;
+    //     console.log(intensity);
+    //     if (this[`string${stringA}`].isPlaying == false) {
+    //         if (this[`string${stringB}`].isConnected) {
+    //             this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
+    //             setTimeout(() => {
+    //                 this.disconnectFilter(stringB);
+    //                 this[`string${stringB}`].isConnected = false;
+    //             }, 500);
+    //         }
+    //         this[`string${stringA}`].loopFilter.frequency = intensity;
+    //         if (!this[`string${stringA}`].isConnected) {
+    //             this.reconnectFilter(stringA);
+    //             this[`string${stringA}`].isConnected = true;
+    //         }
+    //         setTimeout(() => {
+    //             this[`string${stringA}`].playFreq(chromScale[note]);
+    //             this[`string${stringB}`].isPlaying = false;
+    //             this[`string${stringA}`].isPlaying = true;
+    //         }, 5);
+    //       } else {
+    //         if (this[`string${stringA}`].isConnected) {
+    //             this[`string${stringA}`].outputGain.gain.rampTo(0, 0.01);
+    //             setTimeout(() => {
+    //                 this.disconnectFilter(stringA);
+    //                 this[`string${stringA}`].isConnected = false;
+    //             }, 500);
+    //         }
+    //         this[`string${stringB}`].loopFilter.frequency = intensity;
+    //         if (!this[`string${stringB}`].isConnected) {
+    //             this.reconnectFilter(stringB);
+    //             this[`string${stringB}`].isConnected = true;
+    //         }
+    //         setTimeout(() => {
+    //             this[`string${stringB}`].playFreq(chromScale[note]);
+    //             this[`string${stringA}`].isPlaying = false;
+    //             this[`string${stringB}`].isPlaying = true;
+    //         }, 5);
+    //       }
+    // }
+
     swapString(stringA, stringB, note, intensity) {
         // Keeps filter frequency in a suitable range.
         if (intensity < 1000) intensity = 1000;
@@ -126,13 +170,15 @@ class Harp {
         console.log(intensity);
         if (this[`string${stringA}`].isPlaying == false) {
             if (this[`string${stringB}`].isConnected) {
-                this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
+                // this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
+                this[`string${stringB}`].outputGain.gain.rampTo(0, 0.1);
                 setTimeout(() => {
                     this.disconnectFilter(stringB);
                     this[`string${stringB}`].isConnected = false;
-                }, 500);
+                }, 200);
             }
             this[`string${stringA}`].loopFilter.frequency = intensity;
+            // this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
             if (!this[`string${stringA}`].isConnected) {
                 this.reconnectFilter(stringA);
                 this[`string${stringA}`].isConnected = true;
@@ -141,16 +187,18 @@ class Harp {
                 this[`string${stringA}`].playFreq(chromScale[note]);
                 this[`string${stringB}`].isPlaying = false;
                 this[`string${stringA}`].isPlaying = true;
-            }, 5);
+            }, 10);
           } else {
             if (this[`string${stringA}`].isConnected) {
-                this[`string${stringA}`].outputGain.gain.rampTo(0, 0.01);
+                // this[`string${stringA}`].outputGain.gain.rampTo(0, 0.01);
+                this[`string${stringB}`].outputGain.gain.rampTo(0, 0.1);
                 setTimeout(() => {
                     this.disconnectFilter(stringA);
                     this[`string${stringA}`].isConnected = false;
-                }, 500);
+                }, 200);
             }
             this[`string${stringB}`].loopFilter.frequency = intensity;
+            // this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
             if (!this[`string${stringB}`].isConnected) {
                 this.reconnectFilter(stringB);
                 this[`string${stringB}`].isConnected = true;
@@ -159,7 +207,7 @@ class Harp {
                 this[`string${stringB}`].playFreq(chromScale[note]);
                 this[`string${stringA}`].isPlaying = false;
                 this[`string${stringB}`].isPlaying = true;
-            }, 5);
+            }, 10);
           }
     }
 
@@ -187,7 +235,8 @@ class Harp {
             this.swapString('7', '7b', 'B3', intensity*1.6); 
         }
         if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
-            this.swapString('8', '8b', 'C4', intensity*1.7);
+            // this.swapString('8', '8b', 'C4', intensity*1.7);
+            this.swapString('8', '8b', 'C4', 7000);
         }
     }
 
