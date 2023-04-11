@@ -130,7 +130,7 @@ class Harp {
                 setTimeout(() => {
                     this.disconnectFilter(stringB);
                     this[`string${stringB}`].isConnected = false;
-                }, 110);
+                }, 500);
             }
             this[`string${stringA}`].loopFilter.frequency = intensity;
             if (!this[`string${stringA}`].isConnected) {
@@ -148,7 +148,7 @@ class Harp {
                 setTimeout(() => {
                     this.disconnectFilter(stringA);
                     this[`string${stringA}`].isConnected = false;
-                }, 110);
+                }, 500);
             }
             this[`string${stringB}`].loopFilter.frequency = intensity;
             if (!this[`string${stringB}`].isConnected) {
