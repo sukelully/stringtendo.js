@@ -1,13 +1,14 @@
 import { String } from '/js/string3.js';
 import { chromScale } from '/js/notes.js';
 
-class Harp {
+class BassHarp {
     constructor(){
         // Create 8 strings for each note of the major scale + octave
         // and duplicates of each to bypass filter instability.
         for (let i = 1; i <= 8; i++) {
             this[`string${i}`] = new String();
             this[`string${i}b`] = new String();
+
             this[`string${i}b`].isConnected = false;
         }
 
@@ -167,44 +168,32 @@ class Harp {
           }
     }
 
-    // Plays notes with 
     playHarp(joy_X, joy_Y, intensity) {
         if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
-            this.swapString('1', '1b', 'C3', intensity);                                     
+            this.swapString('1', '1b', 'C2', intensity);                                     
         }
         if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
-            this.swapString('2', '2b', 'D3', intensity);  
+            this.swapString('2', '2b', 'D2', intensity);  
         }
         if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
-            this.swapString('3', '3b', 'E3', intensity); 
+            this.swapString('3', '3b', 'E2', intensity); 
         }
         if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
-            this.swapString('4', '4b', 'F3', intensity); 
+            this.swapString('4', '4b', 'F2', intensity); 
         }
         if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
-            this.swapString('5', '5b', 'G3', intensity); 
+            this.swapString('5', '5b', 'G2', intensity); 
         }
         if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
-            this.swapString('6', '6b', 'A3', intensity); 
+            this.swapString('6', '6b', 'A2', intensity); 
         }
         if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
-            this.swapString('7', '7b', 'B3', intensity); 
+            this.swapString('7', '7b', 'B2', intensity); 
         }
         if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
-            this.swapString('8', '8b', 'C4', intensity);
+            this.swapString('8', '8b', 'C2', intensity);
+            // this.swapString('8', '8b', 'C4', 7000);
         }
-    }
-
-    // Plays the chromatic scale.
-    scaleTest() {
-        const notes = ['C4', 'Db4', 'D4', 'Eb4', 'E4', 'F4', 'Gb4', 'G4', 'Ab4', 'A4', 'Bb4', 'B4', 'C5'];
-        let time = 0;
-        notes.forEach(note => {
-          setTimeout(() => {
-            this.string1.playFreq(chromScale[note]);
-          }, time);
-          time += 250;
-        });
     }
 
     // Show/hides HTML an element.
@@ -216,5 +205,5 @@ class Harp {
 }
 
 // Instantiate and export.
-const harp = new Harp();
-export { harp }
+const bassHarp = new BassHarp();
+export { bassHarp }

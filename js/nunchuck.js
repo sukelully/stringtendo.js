@@ -1,36 +1,56 @@
 // Import serialHandler and harp objects.
 import { serialHandler } from '/js/serialHandler.js';
-import { harp } from '/js/harp.js'
+import { harp } from '/js/harp.js';
+import { bassHarp } from '/js/bassHarp.js';
 
-// Controller variables.
-var accX1 = 0;
-var accY1 = 0;
-var accZ1 = 0;
-var buttonZ1 = 0;
-var buttonC1= 0;
-var joyX1 = 0;
-var joyY1 = 0;
+// Nunchuck parameters.
+const nun1 = {
+  // Controller values.
+  accX: 0,
+  accY: 0,
+  accZ: 0,
+  butZ: 0,
+  butC: 0,
+  statButC: 0,
+  joyX: 0,
+  joyY: 0,
 
-var accX2 = 0;
-var accY2 = 0;
-var accZ2 = 0;
-var buttonZ2 = 0;
-var buttonC2= 0;
-var joyX2 = 0;
-var joyY2 = 0;
+  // Rate of change values.
+  initAccX: 0,
+  initAccY: 0,
+  initAccZ: 0,
+  finAccX: 0,
+  finAccY: 0,
+  finAccZ: 0,
+  accX_RoC: 0,
+  accY_RoC: 0,
+  accZ_RoC: 0,
+  accAvgRoc: 0,
+  timeIntervalRoC: 100
+};
 
-// Rate of change variables.
-var initialAccX1 = 0;
-var initialAccY1 = 0;
-var initialAccZ1 = 0;
-var finalAccX1 = 0;
-var finalAccY1 = 0;
-var finalAccZ1 = 0;
-var accX1_RoC = 0;
-var accY1_RoC = 0;
-var accZ1_RoC = 0;
-var acc1AvgRoc = 0;
-var timeIntervalRoC = 100;
+const nun2 = {
+  accX: 0,
+  accY: 0,
+  accZ: 0,
+  butZ: 0,
+  butC: 0,
+  statButC: 0,
+  joyX: 0,
+  joyY: 0,
+
+  initAccX: 0,
+  initAccY: 0,
+  initAccZ: 0,
+  finAccX: 0,
+  finAccY: 0,
+  finAccZ: 0,
+  accX_RoC: 0,
+  accY_RoC: 0,
+  accZ_RoC: 0,
+  accAvgRoc: 0,
+  timeIntervalRoC: 100
+};
 
 // Define a nunchuck class.
 class Nunchuck {
@@ -44,9 +64,6 @@ class Nunchuck {
     }).catch((error) => {
       console.error(error);
     });
-
-    // Initialize the button_C state to 0.
-    this.button_C_state = 0;
   }
 
   // Provides controller functionality.
@@ -69,49 +86,36 @@ class Nunchuck {
         const newMessage = `accX1: ${matches[1]} accY1: ${matches[2]} accZ1: ${matches[3]} buttonZ1: ${matches[4]} buttonC1: ${matches[5]} Joy1: ${matches[6]}, ${matches[7]} 
         accX2: ${matches[8]} accY2: ${matches[9]} accZ2: ${matches[10]}buttonZ2: ${matches[11]} buttonC2: ${matches[12]} Joy2: ${matches[13]}, ${matches[14]}`;
         // Assign pattern matched values to global variables.
-        accX1 = `${matches[1]}`;
-        accY1 = `${matches[2]}`;
-        accZ1 = `${matches[3]}`;
-        buttonZ1 = `${matches[4]}`;
-        buttonC1 = `${matches[5]}`;
-        joyX1 = `${matches[6]}`;
-        joyY1 = `${matches[7]}`;
+        nun1.accX = `${matches[1]}`;
+        nun1.accY = `${matches[2]}`;
+        nun1.accZ = `${matches[3]}`;
+        nun1.butZ = `${matches[4]}`;
+        nun1.butC = `${matches[5]}`;
+        nun1.joyX = `${matches[6]}`;
+        nun1.joyY = `${matches[7]}`;
 
-        accX2 = `${matches[8]}`;
-        accY2 = `${matches[9]}`;
-        accZ2 = `${matches[10]}`;
-        buttonZ2 = `${matches[11]}`;
-        buttonC2 = `${matches[12]}`;
-        joyX2 = `${matches[13]}`;
-        joyY2 = `${matches[14]}`;
+        nun2.accX = `${matches[8]}`;
+        nun2.accY = `${matches[9]}`;
+        nun2.accZ = `${matches[10]}`;
+        nun2.butZ = `${matches[11]}`;
+        nun2.butC = `${matches[12]}`;
+        nun2.joyX = `${matches[13]}`;
+        nun2.joyY = `${matches[14]}`;
 
-        // Get initial values every 100ms.
-        setTimeout(() => {
-          initialAccX1 = accX1;
-          initialAccY1 = accY1;
-          initialAccZ1 = accZ1;
-        }, 300);
-
-        // Calculate the rate of change of all three accelerometer values over 100ms.
-        setTimeout(() => {
-          finalAccX1 = parseFloat(matches[1]);
-          finalAccY1 = parseFloat(matches[2]);
-          finalAccZ1 = parseFloat(matches[3]);
-          accX1_RoC = (finalAccX1 - initialAccX1);   if (accX1_RoC < 0 ) accX1_RoC *= -1;
-          accY1_RoC = (finalAccY1 - initialAccY1);   if (accY1_RoC < 0 ) accY1_RoC *= -1;
-          accZ1_RoC = (finalAccZ1 - initialAccZ1);   if (accZ1_RoC < 0 ) accZ1_RoC *= -1;
-          acc1AvgRoc = (accX1_RoC + accY1_RoC + accZ1_RoC) / 3;
-          timeIntervalRoC = 300;
-        }, timeIntervalRoC);
-
-        // C button is pressed.
-        this.pressbuttonC1();
+        // Calculate rate of change of both controllers.
+        this.calcRateOfChange(nun1, matches);
+        this.calcRateOfChange(nun2, matches);
 
         // Display the data.
         displayedData.innerText = newMessage; // Set the text of the list item to the new message.
+        // displayedData.innerText = nun1.accX;
         this.serialMessagesContainer.innerHTML = ''; // Clear the container.
         this.serialMessagesContainer.appendChild(displayedData); // Add the list item to the container.
       }
+
+      // C button is pressed.
+      this.pressC(nun1);
+      this.pressC(nun2);
   
       // Set a timeout to call this function again after 10 milliseconds.
       // (Arduino code is also ran every 10 milliseconds).
@@ -123,38 +127,67 @@ class Nunchuck {
     }
   }
 
-  scaleIntensity(x) {
+  // Calculates the rate of change of an accelerometer by averaging the rate of change of the
+  // three axes of an accelerometer over 300ms.
+  calcRateOfChange(nunchuck, matches) {
+    // Get initial values every 300ms.
+    setTimeout(() => {
+      nunchuck.initAccX = nunchuck.accX;
+      nunchuck.initAccY = nunchuck.accY;
+      nunchuck.initAccZ = nunchuck.accY;
+    }, 300);
+
+    // Calculate the rate of change of all three accelerometer values over 100ms.
+    setTimeout(() => {
+      nunchuck.finAccX = parseFloat(matches[1]);
+      nunchuck.finAccY = parseFloat(matches[2]);
+      nunchuck.finAccZ = parseFloat(matches[3]);
+      nunchuck.accX_RoC = (nunchuck.finAccX - nunchuck.initAccX);   if (nunchuck.accX_RoC < 0 ) nunchuck.accX_RoC *= -1;
+      nunchuck.accY_RoC = (nunchuck.finAccY - nunchuck.initAccY);   if (nunchuck.accY_RoC < 0 ) nunchuck.accY_RoC *= -1;
+      nunchuck.accZ_RoC = (nunchuck.finAccZ - nunchuck.initAccZ);   if (nunchuck.accZ_RoC < 0 ) nunchuck.accZ_RoC *= -1;
+      nunchuck.accAvgRoc = (nunchuck.accX_RoC + nunchuck.accY_RoC + nunchuck.accZ_RoC) / 3;
+      nunchuck.timeIntervalRoC = 300;
+    }, nunchuck.timeIntervalRoC);
+  }
+
+  // Scales the average rate of change of all accelerometer values
+  // to be in a suitable range for the frequency of the loop filter.
+  scaleIntensity(RoC) {
     const m = (7000 - 1000) / (300 - 1);
     const c = 1000 - m * 1;
-    return m * x + c;
+    return m * RoC + c;
   }
 
   // C button is pressed.
-  pressbuttonC1() {
-    // Check if button_C value has changed from 0 to 1.
-    if (this.buttonC1_state == 0 && buttonC1 == 1) {
-      // Play note on harp if buttonC1 has changed from 0 to 1.
-      const intensity = this.scaleIntensity(acc1AvgRoc);
-      harp.playHarp(joyX1, joyY1, intensity);
-      console.log(`acc1AvgRoc: ${acc1AvgRoc}`);
+  pressC(nunchuck) {
+    // Check if value of C has changed from 0 to 1.
+    if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
+      // Play note on harp if C button has changed from 0 to 1.
+      const intensity = this.scaleIntensity(nunchuck.accAvgRoc);
+      if (nunchuck == nun2) harp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);
+      if (nunchuck == nun1) bassHarp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);      
 
       // Resets rate of change values after string has been plucked
       // so that plucking intensity drops quickly after stopping movement.
-      initialAccX1 = 0;
-      initialAccY1 = 0;
-      initialAccZ1 = 0;
-      finalAccX1 = 0;
-      finalAccY1 = 0;
-      finalAccZ1 = 0;
-      accX1_RoC = 0;
-      accY1_RoC = 0;
-      accZ1_RoC = 0;
-      acc1AvgRoc = 0;
-      timeIntervalRoC = 10;
+      nunchuck.initAccX = 0;
+      nunchuck.initAccY = 0;
+      nunchuck.initAccZ = 0;
+      nunchuck.finAccX = 0;
+      nunchuck.finAccY = 0;
+      nunchuck.finAccZ = 0;
+      nunchuck.accX_RoC = 0;
+      nunchuck.accY_RoC = 0;
+      nunchuck.accZ_RoC = 0;
+      nunchuck.accAvgRoc = 0;
+      nunchuck.timeIntervalRoC = 10;
     }
 
-    // Update the buttonC1 state.
-    this.buttonC1_state = buttonC1;
+    // Update the button C state.
+    nunchuck.statButC = nunchuck.butC;
+  }
+
+  begPressC(nunchuck) {
+    
   }
 }
 

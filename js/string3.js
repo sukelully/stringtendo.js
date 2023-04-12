@@ -6,6 +6,7 @@ class String {
         this.isConnected = true;
         this.noise = new Tone.Noise('brown');            // Pink noise for less high frequency 'shrill'.
         this.pluck = new Tone.Player('/src/harpPluck.wav');
+        this.decayGain = new Tone.Gain(0.999);
 
         this.gain = new Tone.Gain(0.1);
         this.outputGain = new Tone.Gain();
@@ -38,7 +39,9 @@ class String {
         // this.gain.connect(this.output);
         // this.pluck.connect(this.gain);
         this.gain.connect(this.delay);
-        this.delay.connect(this.loopFilter);
+        this.delay.connect(this.decayGain);
+        this.decayGain.connect(this.loopFilter);
+        // this.delay.connect(this.loopFilter);
         this.loopFilter.connect(this.delay);
         this.loopFilter.connect(this.outputGain);
         this.outputGain.connect(this.output);
