@@ -3,25 +3,33 @@ import { serialHandler } from '/js/serialHandler.js';
 import { harp } from '/js/harp.js'
 
 // Controller variables.
-var accX = 0;
-var accY = 0;
-var accZ = 0;
-var buttonZ = 0;
-var buttonC= 0;
-var joyX = 0;
-var joyY = 0;
+var accX1 = 0;
+var accY1 = 0;
+var accZ1 = 0;
+var buttonZ1 = 0;
+var buttonC1= 0;
+var joyX1 = 0;
+var joyY1 = 0;
+
+var accX2 = 0;
+var accY2 = 0;
+var accZ2 = 0;
+var buttonZ2 = 0;
+var buttonC2= 0;
+var joyX2 = 0;
+var joyY2 = 0;
 
 // Rate of change variables.
-var initialAccX = 0;
-var initialAccY = 0;
-var initialAccZ = 0;
-var finalAccX = 0;
-var finalAccY = 0;
-var finalAccZ = 0;
-var accX_RoC = 0;
-var accY_RoC = 0;
-var accZ_RoC = 0;
-var accAvgRoc = 0;
+var initialAccX1 = 0;
+var initialAccY1 = 0;
+var initialAccZ1 = 0;
+var finalAccX1 = 0;
+var finalAccY1 = 0;
+var finalAccZ1 = 0;
+var accX1_RoC = 0;
+var accY1_RoC = 0;
+var accZ1_RoC = 0;
+var acc1AvgRoc = 0;
 var timeIntervalRoC = 100;
 
 // Define a nunchuck class.
@@ -52,42 +60,52 @@ class Nunchuck {
       const displayedData = document.createElement('li');
 
       // Pattern match the incoming message to extract the Nunchuck's controller parameter values.
-      const pattern = /X: ([^ ]+) +Y: ([^ ]+) +Z: ([^ ]+)+button_Z: ([^ ]+) +button_C: ([^ ]+)+Joy: \(([^,]+), ([^)]+)\)/;
+      // const pattern = /X1: ([^ ]+) +Y1: ([^ ]+) +Z1: ([^ ]+)+button_Z1: ([^ ]+) +button_C1: ([^ ]+)+Joy1: \(([^,]+), ([^)]+)\)/; //+X2: ([^ ]+)/;
+      // const pattern = /X1: ([^ ]+) +Y1: ([^ ]+) +Z1: ([^ ]+)+button_Z1: ([^ ]+) +button_C1: ([^ ]+)+Joy1: ([^ ]+) ([^ )]+)+X2: ([^ ]+)/;
+      const pattern = /X1: ([^ ]+) +Y1: ([^ ]+) +Z1: ([^ ]+)+button_Z1: ([^ ]+) +button_C1: ([^ ]+)+Joy1: ([^ ]+) ([^ )]+)X2: ([^ ]+) +Y2: ([^ ]+) +Z2: ([^ ]+)+button_Z2: ([^ ]+) +button_C2: ([^ ]+)+Joy2: ([^ ]+) ([^ )]+)/;
       const matches = message.match(pattern);
       if (matches) {
         // Create a new string with the pattern matched values.
-        const newMessage = `accX: ${matches[1]} accY: ${matches[2]} accZ: ${matches[3]} 
-        buttonZ: ${matches[4]} buttonC: ${matches[5]} Joy: (${matches[6]}, ${matches[7]})`;
+        const newMessage = `accX1: ${matches[1]} accY1: ${matches[2]} accZ1: ${matches[3]} buttonZ1: ${matches[4]} buttonC1: ${matches[5]} Joy1: ${matches[6]}, ${matches[7]} 
+        accX2: ${matches[8]} accY2: ${matches[9]} accZ2: ${matches[10]}buttonZ2: ${matches[11]} buttonC2: ${matches[12]} Joy2: ${matches[13]}, ${matches[14]}`;
         // Assign pattern matched values to global variables.
-        accX = `${matches[1]}`;
-        accY = `${matches[2]}`;
-        accZ = `${matches[3]}`;
-        buttonZ = `${matches[4]}`;
-        buttonC = `${matches[5]}`;
-        joyX = `${matches[6]}`;
-        joyY = `${matches[7]}`;
+        accX1 = `${matches[1]}`;
+        accY1 = `${matches[2]}`;
+        accZ1 = `${matches[3]}`;
+        buttonZ1 = `${matches[4]}`;
+        buttonC1 = `${matches[5]}`;
+        joyX1 = `${matches[6]}`;
+        joyY1 = `${matches[7]}`;
+
+        accX2 = `${matches[8]}`;
+        accY2 = `${matches[9]}`;
+        accZ2 = `${matches[10]}`;
+        buttonZ2 = `${matches[11]}`;
+        buttonC2 = `${matches[12]}`;
+        joyX2 = `${matches[13]}`;
+        joyY2 = `${matches[14]}`;
 
         // Get initial values every 100ms.
         setTimeout(() => {
-          initialAccX = accX;
-          initialAccY = accY;
-          initialAccZ = accZ;
+          initialAccX1 = accX1;
+          initialAccY1 = accY1;
+          initialAccZ1 = accZ1;
         }, 300);
 
         // Calculate the rate of change of all three accelerometer values over 100ms.
         setTimeout(() => {
-          finalAccX = parseFloat(matches[1]);
-          finalAccY = parseFloat(matches[2]);
-          finalAccZ = parseFloat(matches[3]);
-          accX_RoC = (finalAccX - initialAccX);   if (accX_RoC < 0 ) accX_RoC *= -1;
-          accY_RoC = (finalAccY - initialAccY);   if (accY_RoC < 0 ) accY_RoC *= -1;
-          accZ_RoC = (finalAccZ - initialAccZ);   if (accZ_RoC < 0 ) accZ_RoC *= -1;
-          accAvgRoc = (accX_RoC + accY_RoC + accZ_RoC) / 3;
+          finalAccX1 = parseFloat(matches[1]);
+          finalAccY1 = parseFloat(matches[2]);
+          finalAccZ1 = parseFloat(matches[3]);
+          accX1_RoC = (finalAccX1 - initialAccX1);   if (accX1_RoC < 0 ) accX1_RoC *= -1;
+          accY1_RoC = (finalAccY1 - initialAccY1);   if (accY1_RoC < 0 ) accY1_RoC *= -1;
+          accZ1_RoC = (finalAccZ1 - initialAccZ1);   if (accZ1_RoC < 0 ) accZ1_RoC *= -1;
+          acc1AvgRoc = (accX1_RoC + accY1_RoC + accZ1_RoC) / 3;
           timeIntervalRoC = 300;
         }, timeIntervalRoC);
 
         // C button is pressed.
-        this.pressButtonC();
+        this.pressbuttonC1();
 
         // Display the data.
         displayedData.innerText = newMessage; // Set the text of the list item to the new message.
@@ -112,31 +130,31 @@ class Nunchuck {
   }
 
   // C button is pressed.
-  pressButtonC() {
+  pressbuttonC1() {
     // Check if button_C value has changed from 0 to 1.
-    if (this.buttonC_state == 0 && buttonC == 1) {
-      // Play note on harp if buttonC has changed from 0 to 1.
-      const intensity = this.scaleIntensity(accAvgRoc);
-      harp.playHarp(joyX, joyY, intensity);
-      console.log(`accAvgRoc: ${accAvgRoc}`);
+    if (this.buttonC1_state == 0 && buttonC1 == 1) {
+      // Play note on harp if buttonC1 has changed from 0 to 1.
+      const intensity = this.scaleIntensity(acc1AvgRoc);
+      harp.playHarp(joyX1, joyY1, intensity);
+      console.log(`acc1AvgRoc: ${acc1AvgRoc}`);
 
       // Resets rate of change values after string has been plucked
       // so that plucking intensity drops quickly after stopping movement.
-      initialAccX = 0;
-      initialAccY = 0;
-      initialAccZ = 0;
-      finalAccX = 0;
-      finalAccY = 0;
-      finalAccZ = 0;
-      accX_RoC = 0;
-      accY_RoC = 0;
-      accZ_RoC = 0;
-      accAvgRoc = 0;
+      initialAccX1 = 0;
+      initialAccY1 = 0;
+      initialAccZ1 = 0;
+      finalAccX1 = 0;
+      finalAccY1 = 0;
+      finalAccZ1 = 0;
+      accX1_RoC = 0;
+      accY1_RoC = 0;
+      accZ1_RoC = 0;
+      acc1AvgRoc = 0;
       timeIntervalRoC = 10;
     }
 
-    // Update the buttonC state.
-    this.buttonC_state = buttonC;
+    // Update the buttonC1 state.
+    this.buttonC1_state = buttonC1;
   }
 }
 

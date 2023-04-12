@@ -23,9 +23,10 @@
   </header>
 
   <main>
-    <div id='data'>
+    <div id='welcome-text'>
       <h1>Stringtendo</h1>
-      <p>Welcome to Stringtendo! This instrument is controlled by 2 Nintendo nunchucks. To use the instrument, simply connect your nunchucks to your computer and press the "Click to start audio context" button to start playing. </p>
+      <p>Welcome to Stringtendo! This instrument is controlled by 2 Nintendo nunchucks. 
+        To use the instrument, simply connect your nunchucks to your computer and press the "Click to start audio context" button to start playing. </p>
       <button id='audio-context-button' type='button'>Click to start audio context</button>
       <div id='frequency-display'></div>
       <div class='element'>
@@ -37,7 +38,7 @@
       <div id='ks-settings' style='display:none;'>
         <h2>Karplus-Strong Parameter Sliders</h2>
         <p>Adjust the parameters below to create different sounds:</p>
-        <input type='range'min='250' max='6000' value='3000' class='slider' step ='5' id='damp-slider'>
+        <input type='range'min='250' max='6000' value='5000' class='slider' step ='5' id='damp-slider'>
         <p>Dampening: <span id='damp-value'></span></p>
         <input type='range' min='0.000049' max='0.02' value='0.02' class='slider' step ='0.000001' id='del-slider'>
         <p>Delay Time: <span id='del-value'></span></p>

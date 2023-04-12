@@ -5,7 +5,9 @@ class String {
         this.isPlaying = false;
         this.isConnected = true;
         this.noise = new Tone.Noise('brown');            // Pink noise for less high frequency 'shrill'.
-        this.gain = new Tone.Gain(0.5);
+        this.pluck = new Tone.Player('/src/harpPluck.wav');
+
+        this.gain = new Tone.Gain(0.1);
         this.outputGain = new Tone.Gain();
         
         // Might be better at the end of the signal chain - notch filter.
@@ -31,8 +33,10 @@ class String {
 
         // Routing.
         this.noise.connect(this.noiseFilter);
+        this.pluck.connect(this.noiseFilter);
         this.noiseFilter.connect(this.gain);          
         // this.gain.connect(this.output);
+        // this.pluck.connect(this.gain);
         this.gain.connect(this.delay);
         this.delay.connect(this.loopFilter);
         this.loopFilter.connect(this.delay);
@@ -65,11 +69,14 @@ class String {
     pluckString() {
         // Checks to see if this.noise is not already playing.
         const randomInt = Math.floor(Math.random() * (23 - 17) ) + 17;
-        this.noise.start();
+        // this.noise.start();
+        Tone.loaded().then(() => {
+            this.pluck.start();
+        });
         
         // Stop this.noise after 2-7ms.
         setTimeout(() => {
-            this.noise.stop();
+            // this.noise.stop();
         }, randomInt);
         
     }

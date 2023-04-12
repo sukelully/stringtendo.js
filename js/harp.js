@@ -103,6 +103,7 @@ class Harp {
 
     disconnectFilter(string) {
         this[`string${string}`].outputGain.gain.rampTo(0, 0.01);
+        // this[`string${string}`].output.mute = true;
         this[`string${string}`].loopFilter.disconnect();
     }
 

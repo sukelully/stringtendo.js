@@ -19,10 +19,12 @@ body {
   text-align: center;
 }
 
-#data {
+#welcome-text {
   margin: 0 auto;
   text-align: center;
 }
+
+
 
 .slidecontainer {
   width: 50%;
