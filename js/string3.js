@@ -1,19 +1,18 @@
 class String {
     constructor(){
-        // Define the chromatic scale as an object with note names and their corresponding frequencies.
         // Initialise variables for the noise generator, gain, filters, and output nodes.
         this.isPlaying = false;
         this.isConnected = true;
         this.noise = new Tone.Noise('brown');            // Pink noise for less high frequency 'shrill'.
         this.pluck = new Tone.Player('/src/harpPluck.wav');
-        this.decayGain = new Tone.Gain(0.999);
 
+        this.decayGain = new Tone.Gain(0.999);
         this.gain = new Tone.Gain(0.1);
         this.outputGain = new Tone.Gain();
         
         // Might be better at the end of the signal chain - notch filter.
         this.noiseFilter = new Tone.Filter({            // Initial filter used to shape tone.
-            frequency: 10000, 
+            frequency: 5000, 
             type: 'lowpass',
             Q: 1
         });
@@ -25,23 +24,16 @@ class String {
             frequency: 2000,                            // Dampening.
             type: 'lowpass'
         });
-        // Try and make changing dampening variable better.
-        this.loopFilter2 = new Tone.OnePoleFilter({
-            frequency: 2000, 
-            type: 'lowpass'
-        })
         this.output = new Tone.getDestination();
 
         // Routing.
         this.noise.connect(this.noiseFilter);
         this.pluck.connect(this.noiseFilter);
         this.noiseFilter.connect(this.gain);          
-        // this.gain.connect(this.output);
-        // this.pluck.connect(this.gain);
+        // this.gain.connect(this.output);          // Pluck sound
         this.gain.connect(this.delay);
         this.delay.connect(this.decayGain);
         this.decayGain.connect(this.loopFilter);
-        // this.delay.connect(this.loopFilter);
         this.loopFilter.connect(this.delay);
         this.loopFilter.connect(this.outputGain);
         this.outputGain.connect(this.output);
@@ -54,7 +46,6 @@ class String {
 
         // Mute output and disconnect delay loop.
         setTimeout(() => {
-            this.output.mute = true;
             this.delay.disconnect();
         }, 110);    // Lowest interval without pops.
 
@@ -62,15 +53,13 @@ class String {
         setTimeout(() => {
             this.delay.connect(this.loopFilter);
             this.outputGain.gain.rampTo(1, 0.01);
-            this.output.mute = false;
-        }, 120);
+        }, 200);
     }
 
     // Creates a 17-22ms pink noise burst that is fed into the delay line and filter.
     // Longer than a traditional Karplus-Strong noise burst but there are issues with
     // it not making it into the delay line otherwise.
     pluckString() {
-        // Checks to see if this.noise is not already playing.
         const randomInt = Math.floor(Math.random() * (23 - 17) ) + 17;
         // this.noise.start();
         Tone.loaded().then(() => {

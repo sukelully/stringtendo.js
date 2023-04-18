@@ -2,6 +2,7 @@
 import { serialHandler } from '/js/serialHandler.js';
 import { harp } from '/js/harp.js';
 import { bassHarp } from '/js/bassHarp.js';
+import { String } from '/js/string3.js';
 
 // Nunchuck parameters.
 const nun1 = {
@@ -64,6 +65,17 @@ class Nunchuck {
     }).catch((error) => {
       console.error(error);
     });
+
+    this.stringTest = new String();
+
+    // Event listener to play a note when clicking outside of buttons and sliders.
+    document.addEventListener('mousedown', (event) => {
+      if (event.target.matches('button') || event.target.matches('input[type="range"]'))  {
+          return; // Return early if a button or slider is clicked.
+      }
+      this.stringTest.pluckString();
+      console.log("string 4 pluck");
+    });
   }
 
   // Provides controller functionality.
@@ -106,16 +118,17 @@ class Nunchuck {
         this.calcRateOfChange(nun1, matches);
         this.calcRateOfChange(nun2, matches);
 
+        // C button is pressed.
+        this.pressC(nun1);      // Put back in matches loop?
+        this.pressC(nun2);
+        // this.begPressC();
+
         // Display the data.
         displayedData.innerText = newMessage; // Set the text of the list item to the new message.
         // displayedData.innerText = nun1.accX;
         this.serialMessagesContainer.innerHTML = ''; // Clear the container.
         this.serialMessagesContainer.appendChild(displayedData); // Add the list item to the container.
       }
-
-      // C button is pressed.
-      this.pressC(nun1);
-      this.pressC(nun2);
   
       // Set a timeout to call this function again after 10 milliseconds.
       // (Arduino code is also ran every 10 milliseconds).
@@ -186,8 +199,17 @@ class Nunchuck {
     nunchuck.statButC = nunchuck.butC;
   }
 
-  begPressC(nunchuck) {
-    
+  begPressC() {
+    if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {        // South.
+      console.log("bass south");
+      if (106 <= nun2.joyX && nun2.joyX <= 146 && 8 <= nun2.joyY && nun2.joyY <= 48) {        // South.
+        console.log("treble south");
+        if (nun1.statButC == 0 && nun1.butC == 1) {
+          const intensity = this.scaleIntensity(nun2.accAvgRoc);
+          harp.playHarp(nun2.joyX, nun2.joyY, intensity);
+        }
+      }
+    }
   }
 }
 

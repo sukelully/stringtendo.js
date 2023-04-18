@@ -8,9 +8,16 @@ class BassHarp {
         for (let i = 1; i <= 8; i++) {
             this[`string${i}`] = new String();
             this[`string${i}b`] = new String();
-
-            this[`string${i}b`].isConnected = false;
         }
+
+        // Create reverb & output nodes and route the strings to both..
+        this.reverb = new Tone.Reverb(20);
+        this.output = new Tone.getDestination();
+        for (let i = 1; i <= 8; i++) {
+            this[`string${i}`].outputGain.connect(this.reverb);
+            this[`string${i}b`].outputGain.connect(this.reverb);
+        }
+        this.reverb.connect(this.output);
 
         // Set up HTML elements and event listeners.
         this.dampSlider = document.getElementById('damp-slider');
@@ -73,8 +80,7 @@ class BassHarp {
             if (event.target.matches('button') || event.target.matches('input[type="range"]'))  {
                 return; // Return early if a button or slider is clicked.
             }
-            // this.string1.playFreq(chromScale['Gb4']);
-            this.string1.pluckString();
+            // this.swapString('1', '1b', 'C2', 6000); 
         });
 
         // Start the Tone.js audio context.
@@ -86,30 +92,41 @@ class BassHarp {
         this.scaleTestButton = document.getElementById('scale-test-button').addEventListener('click', () => {
             this.scaleTest();
         });
-         // Show/hide the menu.
-        this.toggleMenuButton = document.getElementById('toggle-menu-button').addEventListener('click', async () => {
-            this.toggleVisibility('ks-settings');
-        });
         // Mute strings.
         this.muteStringsButton = document.getElementById('mute-strings-button').addEventListener('click', () => {
             this.muteStrings();
         })
     }
 
-    changeFilterFreq(string, freq) {
-        this[`string${string}`].loopFilter.disconnect();
-        this[`string${string}`].loopFilter.frequency.value = freq;
-    }
-
+    // Disconnects the output of a chosen string's loop filter.
     disconnectFilter(string) {
-        this[`string${string}`].outputGain.gain.rampTo(0, 0.01);
-        // this[`string${string}`].output.mute = true;
-        this[`string${string}`].loopFilter.disconnect();
+        this[`string${string}`].outputGain.gain.rampTo(0, 0.001);
+        console.log(`${string} disconnected`);
+        setTimeout(() => {
+            this[`string${string}`].loopFilter.disconnect();
+            this[`string${string}`].isConnected = false;
+            this[`string${string}`].isPlaying = false;
+        }, 110);
     }
 
+    // Connects a chosen string's loop filter to delay and output node.
     reconnectFilter(string) {
         this[`string${string}`].loopFilter.connect(this[`string${string}`].delay);
-        this[`string${string}`].loopFilter.connect(this[`string${string}`].output);
+        this[`string${string}`].loopFilter.connect(this[`string${string}`].outputGain);
+        this[`string${string}`].outputGain.gain.rampTo(1, 0.001);
+        this[`string${string}`].isConnected = true;
+    }
+
+    // Disconnects and sets the loop filter frequency, then reconnects and plays the specified note.
+    // Avoids clicks and pops.
+    strikeString(stringA, stringB, note, intensity) {
+        this.disconnectFilter(stringB);
+        this[`string${stringA}`].loopFilter.frequency = intensity;
+        this.reconnectFilter(stringA);
+        setTimeout(() => {
+            this[`string${stringA}`].playFreq(chromScale[note]);
+            this[`string${stringA}`].isPlaying = true;
+        }, 50);
     }
 
     // Mutes all strings.
@@ -120,52 +137,18 @@ class BassHarp {
         }
     }
 
+    // Each string has a duplicate that replaces the original each time it is plucked.
+    // Prevents pops in audio and maintains no
     swapString(stringA, stringB, note, intensity) {
         // Keeps filter frequency in a suitable range.
         if (intensity < 1000) intensity = 1000;
         if (intensity > 7000) intensity = 7000;
-        console.log(intensity);
+        intensity = Math.floor(Math.random() * (6000 - 3000) ) + 3000;
         if (this[`string${stringA}`].isPlaying == false) {
-            if (this[`string${stringB}`].isConnected) {
-                // this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
-                this[`string${stringB}`].outputGain.gain.rampTo(0, 0.1);
-                setTimeout(() => {
-                    this.disconnectFilter(stringB);
-                    this[`string${stringB}`].isConnected = false;
-                }, 200);
-            }
-            this[`string${stringA}`].loopFilter.frequency = intensity;
-            // this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
-            if (!this[`string${stringA}`].isConnected) {
-                this.reconnectFilter(stringA);
-                this[`string${stringA}`].isConnected = true;
-            }
-            setTimeout(() => {
-                this[`string${stringA}`].playFreq(chromScale[note]);
-                this[`string${stringB}`].isPlaying = false;
-                this[`string${stringA}`].isPlaying = true;
-            }, 10);
-          } else {
-            if (this[`string${stringA}`].isConnected) {
-                // this[`string${stringA}`].outputGain.gain.rampTo(0, 0.01);
-                this[`string${stringB}`].outputGain.gain.rampTo(0, 0.1);
-                setTimeout(() => {
-                    this.disconnectFilter(stringA);
-                    this[`string${stringA}`].isConnected = false;
-                }, 200);
-            }
-            this[`string${stringB}`].loopFilter.frequency = intensity;
-            // this[`string${stringB}`].outputGain.gain.rampTo(0, 0.01);
-            if (!this[`string${stringB}`].isConnected) {
-                this.reconnectFilter(stringB);
-                this[`string${stringB}`].isConnected = true;
-            }
-            setTimeout(() => {
-                this[`string${stringB}`].playFreq(chromScale[note]);
-                this[`string${stringA}`].isPlaying = false;
-                this[`string${stringB}`].isPlaying = true;
-            }, 10);
-          }
+            this.strikeString(stringA, stringB, note, intensity);
+        } else {
+            this.strikeString(stringB, stringA, note, intensity);
+        }
     }
 
     playHarp(joy_X, joy_Y, intensity) {
@@ -191,16 +174,9 @@ class BassHarp {
             this.swapString('7', '7b', 'B2', intensity); 
         }
         if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
-            this.swapString('8', '8b', 'C2', intensity);
+            this.swapString('8', '8b', 'C3', intensity);
             // this.swapString('8', '8b', 'C4', 7000);
         }
-    }
-
-    // Show/hides HTML an element.
-    // Taken from https://stackoverflow.com/questions/16308779/how-can-i-hide-show-a-div-when-a-button-is-clicked
-    toggleVisibility(id) {
-        var element = document.getElementById(id);
-        element.style.display = (element.style.display == 'block') ? 'none' : 'block';
     }
 }
 
