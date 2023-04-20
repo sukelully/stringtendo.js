@@ -1,5 +1,6 @@
-import { String } from '/js/string3.js';
+import { String } from '/js/string.js';
 import { chromScale } from '/js/notes.js';
+import { EffectsChain } from '/js/effectsChain.js';
 
 class Harp {
     constructor(){
@@ -10,97 +11,58 @@ class Harp {
             this[`string${i}b`] = new String();
         }
 
-        // Create reverb & output nodes and route the strings to both..
-        this.reverb = new Tone.Reverb(20);
+        this.effectsChain = new EffectsChain();
         this.output = new Tone.getDestination();
+
+        // Connect reverb node.
         for (let i = 1; i <= 8; i++) {
-            this[`string${i}`].outputGain.connect(this.reverb);
-            this[`string${i}b`].outputGain.connect(this.reverb);
+            this[`string${i}`].outputGain.connect(this.effectsChain.reverb);
+            this[`string${i}b`].outputGain.connect(this.effectsChain.reverb);
         }
-        this.reverb.connect(this.output);
-
-        // Set up HTML elements and event listeners.
-        this.dampSlider = document.getElementById('damp-slider');
-        this.dampSliderOutput = document.getElementById('damp-value');
-        this.dampSliderOutput.innerHTML = this.dampSlider.value;
-        this.delSlider = document.getElementById('del-slider');
-        this.delSliderOutput = document.getElementById('del-value');
-        this.delSliderOutput.innerHTML = this.delSlider.value;
-        this.filterSlider = document.getElementById('filter-slider');
-        this.filterSliderOutput = document.getElementById('filter-value');
-        this.filterSliderOutput.innerHTML = this.filterSlider.value;
-
-        // Set event listeners to update filter frequency and delay time when sliders are adjusted.
-        this.dampSlider.oninput = () => {
-            this.dampSliderOutput.innerHTML = this.dampSlider.value;
-            for (let i = 1; i <= 8; i++) {
-                this[`string${i}`].loopFilter.frequency = this.dampSlider.value;
-                this[`string${i}b`].loopFilter.frequency = this.dampSlider.value;
-            }
-        }
-        this.delSlider.oninput = () => {
-            this.delSliderOutput.innerHTML = this.delSlider.value;
-            for (let i = 1; i <= 8; i++) {
-                this[`string${i}`].delay.delayTime.value = this.delSlider.value;
-                this[`string${i}b`].delay.delayTime.value = this.delSlider.value;
-            }
-        }
-        this.filterSlider.oninput = () => {
-            this.filterSliderOutput.innerHTML = this.filterSlider.value;
-            for (let i = 1; i <= 8; i++) {
-                this[`string${i}`].noiseFilter.frequency.value = this.filterSlider.value;
-                this[`string${i}b`].noiseFilter.frequency.value = this.filterSlider.value;
-            }
-        }
-
-        // OnePoleFilter node is unstable when frequency is adjusted so it must be disconnected first.
-        // Set up event listeners for damp slider mousedown and mouseup events to do so.
-        this.dampSlider.addEventListener('mousedown', (event) => {
-            if (event.currentTarget === this.dampSlider) {
-                // Disconnect loopFilter node is damp slider is adjusted.
-                for (let i = 1; i <= 8; i++) {
-                    this[`string${i}`].loopFilter.disconnect();
-                }
-            }
-            // this.string1.loopFilter.frequency = this.dampSlider.value;
-            for (let i = 1; i <= 8; i++) {
-                this[`string${i}`].loopFilter.frequency = this.dampSlider.value;
-            }
-        });
-        // Reconnect node upon mouseup event.
-        this.dampSlider.addEventListener('mouseup', (event) => {
-            for (let i = 1; i <= 8; i++) {
-                this[`string${i}`].loopFilter.connect(this[`string${i}`].delay);
-                this[`string${i}`].loopFilter.connect(this[`string${i}`].output);
-            }
-        });
-
-        // Event listener to play a note when clicking outside of buttons and sliders.
-        document.addEventListener('mousedown', (event) => {
-            if (event.target.matches('button') || event.target.matches('input[type="range"]'))  {
-                return; // Return early if a button or slider is clicked.
-            }
-            // this.swapString('1', '1b', 'C3', 6000); 
-        });
+        this.effectsChain.reverb.connect(this.output);
 
         // Start the Tone.js audio context.
         this.audioContextButton = document.getElementById('audio-context-button').addEventListener('click', async () => {
             await Tone.start();
             console.log('audio context started');
         });
-        // Chromatic scale test.
-        this.scaleTestButton = document.getElementById('scale-test-button').addEventListener('click', () => {
-            this.scaleTest();
-        });
-         // Show/hide the menu.
-        this.toggleMenuButton = document.getElementById('toggle-menu-button').addEventListener('click', async () => {
-            this.toggleVisibility('ks-settings');
-            console.log("menu clicked");
-        });
+
         // Mute strings.
         this.muteStringsButton = document.getElementById('mute-strings-button').addEventListener('click', () => {
             this.muteStrings();
         })
+
+        // Toggle delay.
+        this.toggleDelayButton = document.getElementById('toggle-delay-button').addEventListener('click', (event) => {
+            for (let i = 1; i <= 8; i++) {
+                this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
+                this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
+            }
+            this.effectsChain.delayIsConnected = !this.effectsChain.delayIsConnected;
+            console.log(`delay on: ${this.effectsChain.delayIsConnected}`);
+
+            if (this.effectsChain.delayIsConnected) {
+                event.target.style.backgroundColor = '#04AA6D';
+            } else {
+                event.target.style.backgroundColor = '#b3b3b3';
+            }
+        });
+
+        // Toggle reverb.
+        this.toggleReverbButton = document.getElementById('toggle-reverb-button').addEventListener('click', (event) => {
+            for (let i = 1; i <= 8; i++) {
+                this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
+                this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
+            }
+            this.effectsChain.reverbIsConnected = !this.effectsChain.reverbIsConnected;
+            console.log(`reverb on: ${this.effectsChain.reverbIsConnected}`);
+
+            if (this.effectsChain.reverbIsConnected) {
+                event.target.style.backgroundColor = '#04AA6D';
+            } else {
+                event.target.style.backgroundColor = '#b3b3b3';
+            }
+        });
     }
 
     // Disconnects the output of a chosen string's loop filter.
@@ -147,8 +109,6 @@ class Harp {
         // Keeps filter frequency in a suitable range.
         if (intensity < 1000) intensity = 1000;
         if (intensity > 7000) intensity = 7000;
-        // intensity = Math.floor(Math.random() * (6000 - 3000) ) + 3000;
-        intensity = 3000;
         if (this[`string${stringA}`].isPlaying == false) {
             this.strikeString(stringA, stringB, note, intensity);
         } else {

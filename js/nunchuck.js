@@ -2,10 +2,12 @@
 import { serialHandler } from '/js/serialHandler.js';
 import { harp } from '/js/harp.js';
 import { bassHarp } from '/js/bassHarp.js';
-import { String } from '/js/string3.js';
+import { pluckSynth } from '/js/pluckSynth.js';
+import { bassPluckSynth } from '/js/bassPluckSynth.js';
+import { String } from '/js/string.js';
 
 // Nunchuck parameters.
-const nun1 = {
+const nun1 = {  // Treble nunchuck.
   // Controller values.
   accX: 0,
   accY: 0,
@@ -30,7 +32,7 @@ const nun1 = {
   timeIntervalRoC: 100
 };
 
-const nun2 = {
+const nun2 = {  // Bass nunchuck.
   accX: 0,
   accY: 0,
   accZ: 0,
@@ -67,6 +69,7 @@ class Nunchuck {
     });
 
     this.stringTest = new String();
+    this.stringtendo = false;
 
     // Event listener to play a note when clicking outside of buttons and sliders.
     document.addEventListener('mousedown', (event) => {
@@ -75,6 +78,10 @@ class Nunchuck {
       }
       this.stringTest.pluckString();
       console.log("string 4 pluck");
+    });
+
+    this.toggleSynthButton = document.getElementById('toggle-synth-button').addEventListener('click', (event) => {
+
     });
   }
 
@@ -89,8 +96,6 @@ class Nunchuck {
       const displayedData = document.createElement('li');
 
       // Pattern match the incoming message to extract the Nunchuck's controller parameter values.
-      // const pattern = /X1: ([^ ]+) +Y1: ([^ ]+) +Z1: ([^ ]+)+button_Z1: ([^ ]+) +button_C1: ([^ ]+)+Joy1: \(([^,]+), ([^)]+)\)/; //+X2: ([^ ]+)/;
-      // const pattern = /X1: ([^ ]+) +Y1: ([^ ]+) +Z1: ([^ ]+)+button_Z1: ([^ ]+) +button_C1: ([^ ]+)+Joy1: ([^ ]+) ([^ )]+)+X2: ([^ ]+)/;
       const pattern = /X1: ([^ ]+) +Y1: ([^ ]+) +Z1: ([^ ]+)+button_Z1: ([^ ]+) +button_C1: ([^ ]+)+Joy1: ([^ ]+) ([^ )]+)X2: ([^ ]+) +Y2: ([^ ]+) +Z2: ([^ ]+)+button_Z2: ([^ ]+) +button_C2: ([^ ]+)+Joy2: ([^ ]+) ([^ )]+)/;
       const matches = message.match(pattern);
       if (matches) {
@@ -114,14 +119,17 @@ class Nunchuck {
         nun2.joyX = `${matches[13]}`;
         nun2.joyY = `${matches[14]}`;
 
-        // Calculate rate of change of both controllers.
-        this.calcRateOfChange(nun1, matches);
-        this.calcRateOfChange(nun2, matches);
+        if (this.stringtendo == true) {
+          // Calculate rate of change of both controllers.
+          this.calcRateOfChange(nun1, matches);        
+          this.calcRateOfChange(nun2, matches);
 
-        // C button is pressed.
-        this.pressC(nun1);      // Put back in matches loop?
-        this.pressC(nun2);
-        // this.begPressC();
+          // RoC debugging.
+          // console.log(`avgRoC: ${nun2.accAvgRoc}`);
+          // console.log(`X_RoC: ${nun2.accX_RoC}`);
+          // console.log(`Y_RoC: ${nun2.accY_RoC}`);
+          // console.log(`Z_RoC: ${nun2.accZ_RoC}`);
+        }
 
         // Display the data.
         displayedData.innerText = newMessage; // Set the text of the list item to the new message.
@@ -129,7 +137,17 @@ class Nunchuck {
         this.serialMessagesContainer.innerHTML = ''; // Clear the container.
         this.serialMessagesContainer.appendChild(displayedData); // Add the list item to the container.
       }
-  
+
+      if (this.stringtendo == true) {
+        // C button is pressed.
+        this.strPressC(nun1);
+        this.strPressC(nun2);
+        // this.begPressC();
+      } else {
+        this.pluckPressC(nun1);
+        this.pluckPressC(nun2);
+      }
+
       // Set a timeout to call this function again after 10 milliseconds.
       // (Arduino code is also ran every 10 milliseconds).
       setTimeout(() => {
@@ -140,45 +158,64 @@ class Nunchuck {
     }
   }
 
-  // Calculates the rate of change of an accelerometer by averaging the rate of change of the
-  // three axes of an accelerometer over 300ms.
+   // Calculates the rate of change of an accelerometer by averaging the rate of change of the
+  // three axes of an accelerometer over 100ms.
   calcRateOfChange(nunchuck, matches) {
-    // Get initial values every 300ms.
+    // Get initial values every 100ms.
     setTimeout(() => {
       nunchuck.initAccX = nunchuck.accX;
       nunchuck.initAccY = nunchuck.accY;
       nunchuck.initAccZ = nunchuck.accY;
-    }, 300);
+    }, 100);
 
     // Calculate the rate of change of all three accelerometer values over 100ms.
     setTimeout(() => {
-      nunchuck.finAccX = parseFloat(matches[1]);
-      nunchuck.finAccY = parseFloat(matches[2]);
-      nunchuck.finAccZ = parseFloat(matches[3]);
-      nunchuck.accX_RoC = (nunchuck.finAccX - nunchuck.initAccX);   if (nunchuck.accX_RoC < 0 ) nunchuck.accX_RoC *= -1;
-      nunchuck.accY_RoC = (nunchuck.finAccY - nunchuck.initAccY);   if (nunchuck.accY_RoC < 0 ) nunchuck.accY_RoC *= -1;
-      nunchuck.accZ_RoC = (nunchuck.finAccZ - nunchuck.initAccZ);   if (nunchuck.accZ_RoC < 0 ) nunchuck.accZ_RoC *= -1;
+      if (nunchuck == nun1) {
+        nunchuck.finAccX = parseFloat(matches[1]);
+        nunchuck.finAccY = parseFloat(matches[2]);
+        nunchuck.finAccZ = parseFloat(matches[3]);
+      } else {
+        nunchuck.finAccX = parseFloat(matches[8]);
+        nunchuck.finAccY = parseFloat(matches[9]);
+        nunchuck.finAccZ = parseFloat(matches[10]);
+      }
+      nunchuck.accX_RoC = (nunchuck.finAccX - nunchuck.initAccX); // if (nunchuck.accX_RoC < 0 ) nunchuck.accX_RoC *= -1;
+      nunchuck.accY_RoC = (nunchuck.finAccY - nunchuck.initAccY); //  if (nunchuck.accY_RoC < 0 ) nunchuck.accY_RoC *= -1;
+      nunchuck.accZ_RoC = (nunchuck.finAccZ - nunchuck.initAccZ); //  if (nunchuck.accZ_RoC < 0 ) nunchuck.accZ_RoC *= -1;
       nunchuck.accAvgRoc = (nunchuck.accX_RoC + nunchuck.accY_RoC + nunchuck.accZ_RoC) / 3;
-      nunchuck.timeIntervalRoC = 300;
+      nunchuck.timeIntervalRoC = 100;
     }, nunchuck.timeIntervalRoC);
   }
 
   // Scales the average rate of change of all accelerometer values
   // to be in a suitable range for the frequency of the loop filter.
   scaleIntensity(RoC) {
-    const m = (7000 - 1000) / (300 - 1);
+    // console.log(`RoC: ${RoC}`);
+    const m = (7000 - 1000) / 300;
     const c = 1000 - m * 1;
     return m * RoC + c;
   }
 
+  pluckPressC(nunchuck) {
+    if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
+      if (nunchuck == nun1) pluckSynth.playHarp(nunchuck.joyX, nunchuck.joyY);
+      if (nunchuck == nun2) bassPluckSynth.playHarp(nunchuck.joyX, nunchuck.joyY);
+    }
+
+    // Update the button C state.
+    nunchuck.statButC = nunchuck.butC;
+  }
+
   // C button is pressed.
-  pressC(nunchuck) {
+  strPressC(nunchuck) {
     // Check if value of C has changed from 0 to 1.
     if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
       // Play note on harp if C button has changed from 0 to 1.
       const intensity = this.scaleIntensity(nunchuck.accAvgRoc);
-      if (nunchuck == nun2) harp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);
-      if (nunchuck == nun1) bassHarp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);      
+      // console.log(`intensity: ${intensity}`)
+      // console.log(intensity);
+      if (nunchuck == nun1) harp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);
+      if (nunchuck == nun2) bassHarp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);      
 
       // Resets rate of change values after string has been plucked
       // so that plucking intensity drops quickly after stopping movement.

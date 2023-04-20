@@ -106,6 +106,10 @@ button {
   cursor: pointer;
 }
 
+#toggle-delay-button {
+  background-color: #b3b3b3;
+}
+
 button:hover {
   opacity: 0.8;
 }
