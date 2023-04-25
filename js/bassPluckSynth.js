@@ -1,9 +1,33 @@
+import { EffectsChain } from '/js/effectsChain.js';
+
 class BassPluckSynth {
     constructor() {
+        // Create synth and effects objects.
         this.pluckSynth = new Tone.PluckSynth();
+        this.effectsChain = new EffectsChain();
         this.output = new Tone.getDestination();
 
-        this.pluckSynth.connect(this.output);
+        // Routing.
+        this.pluckSynth.connect(this.effectsChain.reverb);
+        this.effectsChain.reverb.connect(this.output);
+
+        // Toggle filter event listener.
+        this.toggleFilterButton = document.getElementById('toggle-filter-button').addEventListener('click', () => {
+            this.effectsChain.toggleFilter(this.pluckSynth, this.output);
+            this.effectsChain.filterIsConnected = !this.effectsChain.filterIsConnected;
+        });
+
+        // Toggle delay event listener.
+        this.toggleDelayButton = document.getElementById('toggle-delay-button').addEventListener('click', () => {
+            this.effectsChain.toggleDelay(this.pluckSynth, this.output);
+            this.effectsChain.delayIsConnected = !this.effectsChain.delayIsConnected;
+        });
+
+        // Toggle reverb event listener.
+        this.toggleReverbButton = document.getElementById('toggle-reverb-button').addEventListener('click', () => {
+            this.effectsChain.toggleReverb(this.pluckSynth, this.output);
+            this.effectsChain.reverbIsConnected = !this.effectsChain.reverbIsConnected;
+        });
     }
 
     // Plays notes with joystick.

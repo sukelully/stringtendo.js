@@ -27,17 +27,29 @@ class Harp {
             console.log('audio context started');
         });
 
-        // Mute strings.
+        // Mute strings event listener.
         this.muteStringsButton = document.getElementById('mute-strings-button').addEventListener('click', () => {
             this.muteStrings();
-        })
+        });
 
-        // Toggle delay.
-        this.toggleDelayButton = document.getElementById('toggle-delay-button').addEventListener('click', (event) => {
-            for (let i = 1; i <= 8; i++) {
-                this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
-                this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
+        // Toggle filter event listner.
+        this.toggleFilterButton = document.getElementById('toggle-filter-button').addEventListener('click', (event) => {
+            this.effectsChain.filterIsConnected = !this.effectsChain.filterIsConnected;
+            console.log(`filter on: ${this.effectsChain.filterIsConnected}`);
+
+            if (this.effectsChain.filterIsConnected) {
+                event.target.style.backgroundColor = '#04AA6D';
+            } else {
+                event.target.style.backgroundColor = '#b3b3b3';
             }
+        });
+
+        // Toggle delay event listener.
+        this.toggleDelayButton = document.getElementById('toggle-delay-button').addEventListener('click', (event) => {
+            // for (let i = 1; i <= 8; i++) {
+            //     this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
+            //     this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
+            // }
             this.effectsChain.delayIsConnected = !this.effectsChain.delayIsConnected;
             console.log(`delay on: ${this.effectsChain.delayIsConnected}`);
 
@@ -48,12 +60,12 @@ class Harp {
             }
         });
 
-        // Toggle reverb.
+        // Toggle reverb event listener.
         this.toggleReverbButton = document.getElementById('toggle-reverb-button').addEventListener('click', (event) => {
-            for (let i = 1; i <= 8; i++) {
-                this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
-                this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
-            }
+            // for (let i = 1; i <= 8; i++) {
+            //     this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
+            //     this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
+            // }
             this.effectsChain.reverbIsConnected = !this.effectsChain.reverbIsConnected;
             console.log(`reverb on: ${this.effectsChain.reverbIsConnected}`);
 

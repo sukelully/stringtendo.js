@@ -106,7 +106,15 @@ button {
   cursor: pointer;
 }
 
+#toggle-filter-button {
+  background-color: #b3b3b3;
+}
+
 #toggle-delay-button {
+  background-color: #b3b3b3;
+}
+
+#toggle-synth-button {
   background-color: #b3b3b3;
 }
 

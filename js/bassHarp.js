@@ -21,29 +21,27 @@ class BassHarp {
         }
         this.effectsChain.reverb.connect(this.output);
 
-        // Mute strings.
+        // Mute strings event listener.
         this.muteStringsButton = document.getElementById('mute-strings-button').addEventListener('click', () => {
             this.muteStrings();
         });
 
-        // Toggle delay.
+        // Toggle delay event listener.
         this.toggleDelayButton = document.getElementById('toggle-delay-button').addEventListener('click', () => {
-            for (let i = 1; i <= 8; i++) {
-                this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
-                this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
-            }
+            // for (let i = 1; i <= 8; i++) {
+            //     this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
+            //     this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
+            // }
             this.effectsChain.delayIsConnected = !this.effectsChain.delayIsConnected;
-            console.log(`delay on: ${this.effectsChain.delayIsConnected}`);
         });
 
-        // Toggle reverb.
+        // Toggle reverb event listener.
         this.toggleReverbButton = document.getElementById('toggle-reverb-button').addEventListener('click', () => {
-            for (let i = 1; i <= 8; i++) {
-                this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
-                this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
-            }
-            this.effectsChain.reverbIsConnected = !this.effectsChain.reverbIsConnected;
-            console.log(`reverb on: ${this.effectsChain.reverbIsConnected}`);
+            // for (let i = 1; i <= 8; i++) {
+            //     this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
+            //     this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
+            // }
+            this.effectsChain.reverbIsConnected = !this.effectsChain.reverbIsConnected;;
         });
     }
 

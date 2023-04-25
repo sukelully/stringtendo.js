@@ -7,12 +7,12 @@ class String {
         this.pluck = new Tone.Player('/src/harpPluck.wav');
 
         this.decayGain = new Tone.Gain(0.999);
-        this.gain = new Tone.Gain(0.1);
+        this.gain = new Tone.Gain(0.4);
         this.outputGain = new Tone.Gain();
         
         // Might be better at the end of the signal chain - notch filter.
         this.noiseFilter = new Tone.Filter({            // Initial filter used to shape tone.
-            frequency: 5000, 
+            frequency: 20000, 
             type: 'lowpass',
             Q: 1
         });
@@ -36,7 +36,7 @@ class String {
         this.decayGain.connect(this.loopFilter);
         this.loopFilter.connect(this.delay);
         this.loopFilter.connect(this.outputGain);
-        this.outputGain.connect(this.output);
+        // this.outputGain.connect(this.output);
     }
 
     // Clears delay loop.

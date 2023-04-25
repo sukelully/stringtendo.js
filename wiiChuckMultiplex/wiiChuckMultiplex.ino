@@ -67,5 +67,5 @@ void loop() {
   Serial.println(nunchuck2.getJoyY());
   Serial.println("");
 
-  delay(10);    // Same time delay as main nunchuck.js loop.
+  delay(20);    // Same time delay as main nunchuck.js loop.
 }

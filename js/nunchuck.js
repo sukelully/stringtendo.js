@@ -81,7 +81,14 @@ class Nunchuck {
     });
 
     this.toggleSynthButton = document.getElementById('toggle-synth-button').addEventListener('click', (event) => {
+      this.stringtendo = !this.stringtendo;
 
+      if (this.stringtendo) {
+        event.target.style.backgroundColor = '#04AA6D';
+
+      } else {
+          event.target.style.backgroundColor = '#b3b3b3';
+      }
     });
   }
 
@@ -125,8 +132,8 @@ class Nunchuck {
           this.calcRateOfChange(nun2, matches);
 
           // RoC debugging.
-          // console.log(`avgRoC: ${nun2.accAvgRoc}`);
-          // console.log(`X_RoC: ${nun2.accX_RoC}`);
+          console.log(`avgRoC: ${nun2.accAvgRoc}`);
+          // console.log(`X_RoC: ${nun2.accX_RoC}`); 
           // console.log(`Y_RoC: ${nun2.accY_RoC}`);
           // console.log(`Z_RoC: ${nun2.accZ_RoC}`);
         }
@@ -152,7 +159,7 @@ class Nunchuck {
       // (Arduino code is also ran every 10 milliseconds).
       setTimeout(() => {
         this.nunchuckLoop();
-      }, 10);
+      }, 20);
     } catch (error) {
       console.error(error);
     }
@@ -179,9 +186,9 @@ class Nunchuck {
         nunchuck.finAccY = parseFloat(matches[9]);
         nunchuck.finAccZ = parseFloat(matches[10]);
       }
-      nunchuck.accX_RoC = (nunchuck.finAccX - nunchuck.initAccX); // if (nunchuck.accX_RoC < 0 ) nunchuck.accX_RoC *= -1;
-      nunchuck.accY_RoC = (nunchuck.finAccY - nunchuck.initAccY); //  if (nunchuck.accY_RoC < 0 ) nunchuck.accY_RoC *= -1;
-      nunchuck.accZ_RoC = (nunchuck.finAccZ - nunchuck.initAccZ); //  if (nunchuck.accZ_RoC < 0 ) nunchuck.accZ_RoC *= -1;
+      nunchuck.accX_RoC = (nunchuck.finAccX - nunchuck.initAccX);  if (nunchuck.accX_RoC < 0 ) nunchuck.accX_RoC *= -1;
+      nunchuck.accY_RoC = (nunchuck.finAccY - nunchuck.initAccY);  if (nunchuck.accY_RoC < 0 ) nunchuck.accY_RoC *= -1;
+      nunchuck.accZ_RoC = (nunchuck.finAccZ - nunchuck.initAccZ);  if (nunchuck.accZ_RoC < 0 ) nunchuck.accZ_RoC *= -1;
       nunchuck.accAvgRoc = (nunchuck.accX_RoC + nunchuck.accY_RoC + nunchuck.accZ_RoC) / 3;
       nunchuck.timeIntervalRoC = 100;
     }, nunchuck.timeIntervalRoC);
