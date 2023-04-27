@@ -1,6 +1,5 @@
 // Import serialHandler and harp objects.
-// import { serialHandler } from '/js/serialHandler.js';
-import { serialHandler } from '/js/readSerialData.js';
+import { serialHandler } from '/js/serialHandler.js';
 import { harp } from '/js/harp.js';
 import { bassHarp } from '/js/bassHarp.js';
 import { pluckSynth } from '/js/pluckSynth.js';
@@ -64,6 +63,9 @@ class Nunchuck {
     // Get a reference to the container where serial messages will be displayed.
     this.serialMessagesContainer = document.getElementById('serial-messages-container');
 
+    // Buffer to store the incoming serial data
+    this.serialBuffer = '';
+
     // Initialise the serialHandler and start listening for incoming messages.
     serialHandler.init().then(() => {
       this.nunchuckLoop(); // Start the process of reading serial messages.
@@ -103,60 +105,36 @@ class Nunchuck {
       }
     });
   }
-
- // Provides controller functionality.
-// Extract controller data from serial message, listen for button presses and calculate rate of change.
-async nunchuckLoop() {
-  try {
-    // Read serial data when it is received.
-    const data = await serialHandler.read();
-    const parsedData = serialHandler.parseData(data);
-    console.log(parsedData);
-
-    nun1.accX = parsedData.accelX;
-    nun1.accY = parsedData.accelY;
-    nun1.accZ = parsedData.accelZ;
-    nun1.butZ = parsedData.buttonZ;
-    nun1.butC = parsedData.buttonC;
-    nun1.joyX = parsedData.joyX;
-    nun1.joyY = parsedData.joyY;
-    console.log(nun1.butC);
-
-    nun2.accX = parsedData.accelX;
-    nun2.accY = parsedData.accelY;
-    nun2.accZ = parsedData.accelZ;
-    nun2.butZ = parsedData.buttonZ;
-    nun2.butC = parsedData.buttonC;
-    nun2.joyX = parsedData.joyX;
-    nun2.joyY = parsedData.joyY;
-    // console.log(nun2.butC);
-
-    if (this.stringtendo) {
-      // Calculate rate of change of both controllers.
+  
+  async nunchuckLoop() {
+    try {
+      // Read serial data when it is received.
+      const matches = await this.readSerialData();
+  
+      // Update the values and remove the matched message from the buffer.
+      this.updateValues(matches);
+      this.serialBuffer = this.serialBuffer.slice(matches[0].length);
+  
+      // Update the RoC calculations and button presses.
       this.calcRateOfChange(nun1);
       this.calcRateOfChange(nun2);
+  
+      if (this.stringtendo) {
+        // C button is pressed.
+        this.strPressC(nun1);
+        this.strPressC(nun2);
+      } else {
+        this.pluckPressC(nun1);
+        this.pluckPressC(nun2);
+      }
+  
+      setTimeout(() => {
+        this.nunchuckLoop();
+      }, 25);
+    } catch (error) {
+      console.error(error);
     }
-
-    // // Update the RoC calculations and button presses.
-    // this.calcRateOfChange(nun1);
-    // this.calcRateOfChange(nun2);
-
-    if (this.stringtendo == true) {
-      // C button is pressed.
-      this.strPressC(nun1);
-      this.strPressC(nun2);
-    } else {
-      this.pluckPressC(nun1);
-      this.pluckPressC(nun2);
-    }
-
-  setTimeout(() => {
-      this.nunchuckLoop();
-    }, 10);
-  } catch (error) {
-    console.error(error);
-  }
-}
+  }  
 
 updateValues(matches) {
   // Assign pattern matched values to global variables.
@@ -183,6 +161,28 @@ updateValues(matches) {
   if (this.serialMessagesContainer.textContent !== newMessage) {
     this.serialMessagesContainer.textContent = newMessage;
   }
+}
+
+async readSerialData() {
+  return new Promise(async (resolve) => {
+    while (true) {
+      try {
+        const data = await serialHandler.read();
+        this.serialBuffer += data;
+
+        // Check if there's a complete message in the buffer.
+        const pattern = /^([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+)\r\n([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+)/;
+        const matches = this.serialBuffer.match(pattern);
+
+        if (matches) {
+          resolve(matches);
+          break;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  });
 }
 
   calcRateOfChange(nunchuck) {
@@ -227,7 +227,6 @@ updateValues(matches) {
   strPressC(nunchuck) {
     // Check if value of C has changed from 0 to 1.
     if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
-      console.log('yay');
       // Play note on harp if C button has changed from 0 to 1.
       const intensity = this.scaleIntensity(nunchuck.accAvgRoc);
       // console.log(`intensity: ${intensity}`)
@@ -258,68 +257,68 @@ updateValues(matches) {
 // Create nunchuck object.
 const nunchuck = new Nunchuck();
 
+/*
 // Provides controller functionality.
-// // Extract controller data from serial message, listen for button presses and calculate rate of change.
-// async nunchuckLoop() {
-//   try {
-//     // Read serial data when it is received.
-//     const data = await serialHandler.read();
-    
-//     console.log(serialHandler.parseData(data));
+// Extract controller data from serial message, listen for button presses and calculate rate of change.
+async nunchuckLoop() {
+  try {
+    // Read serial data when it is received.
+    const message = await serialHandler.read();
 
-    // // Pattern match the incoming message to extract the Nunchuck's controller parameter values.
-    // const pattern = /^([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+)\r\n([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+)/;
-    // const matches = message.match(pattern);
-    // if (matches) {
-    //   // Assign pattern matched values to global variables.
-    //   nun1.accX = matches[1];
-    //   nun1.accY = matches[2];
-    //   nun1.accZ = matches[3];
-    //   nun1.butZ = matches[4];
-    //   nun1.butC = matches[5];
-    //   nun1.joyX = matches[6];
-    //   nun1.joyY = matches[7];
+    // Pattern match the incoming message to extract the Nunchuck's controller parameter values.
+    const pattern = /^([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+)\r\n([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+),([-\d]+)/;
+    const matches = message.match(pattern);
+    if (matches) {
+      // Assign pattern matched values to global variables.
+      nun1.accX = matches[1];
+      nun1.accY = matches[2];
+      nun1.accZ = matches[3];
+      nun1.butZ = matches[4];
+      nun1.butC = matches[5];
+      nun1.joyX = matches[6];
+      nun1.joyY = matches[7];
 
-    //   nun2.accX = matches[8];
-    //   nun2.accY = matches[9];
-    //   nun2.accZ = matches[10];
-    //   nun2.butZ = matches[11];
-    //   nun2.butC = matches[12];
-    //   nun2.joyX = matches[13];
-    //   nun2.joyY = matches[14];
+      nun2.accX = matches[8];
+      nun2.accY = matches[9];
+      nun2.accZ = matches[10];
+      nun2.butZ = matches[11];
+      nun2.butC = matches[12];
+      nun2.joyX = matches[13];
+      nun2.joyY = matches[14];
 
-    //   // Update the displayed data only if there's a change in the data.
-    //   const newMessage = `accX1: ${nun1.accX} accY1: ${nun1.accY} accZ1: ${nun1.accZ} buttonZ1: ${nun1.butZ} buttonC1: ${nun1.butC} Joy1: ${nun1.joyX}, ${nun1.joyY}
-    //   accX2: ${nun2.accX} accY2: ${nun2.accY} accZ2: ${nun2.accZ} buttonZ2: ${nun2.butZ} buttonC2: ${nun2.butC} Joy2: ${nun2.joyX}, ${nun2.joyY}`;
+      // Update the displayed data only if there's a change in the data.
+      const newMessage = `accX1: ${nun1.accX} accY1: ${nun1.accY} accZ1: ${nun1.accZ} buttonZ1: ${nun1.butZ} buttonC1: ${nun1.butC} Joy1: ${nun1.joyX}, ${nun1.joyY}
+      accX2: ${nun2.accX} accY2: ${nun2.accY} accZ2: ${nun2.accZ} buttonZ2: ${nun2.butZ} buttonC2: ${nun2.butC} Joy2: ${nun2.joyX}, ${nun2.joyY}`;
 
-    //   if (this.serialMessagesContainer.textContent !== newMessage) {
-    //     this.serialMessagesContainer.textContent = newMessage;
-    //   }
-    // }
+      if (this.serialMessagesContainer.textContent !== newMessage) {
+        this.serialMessagesContainer.textContent = newMessage;
+      }
+    }
 
-    // if (this.stringtendo) {
-    //   // Calculate rate of change of both controllers.
-    //   this.calcRateOfChange(nun1, matches);
-    //   this.calcRateOfChange(nun2, matches);
-    // }
+    if (this.stringtendo == true) {
+      // Calculate rate of change of both controllers.
+      this.calcRateOfChange(nun1, matches);
+      this.calcRateOfChange(nun2, matches);
+    }
 
-    // // Update the RoC calculations and button presses.
-    // this.calcRateOfChange(nun1);
-    // this.calcRateOfChange(nun2);
+    // Update the RoC calculations and button presses.
+    this.calcRateOfChange(nun1);
+    this.calcRateOfChange(nun2);
 
-    // if (this.stringtendo == true) {
-    //   // C button is pressed.
-    //   this.strPressC(nun1);
-    //   this.strPressC(nun2);
-    // } else {
-    //   this.pluckPressC(nun1);
-    //   this.pluckPressC(nun2);
-//     // }
+    if (this.stringtendo) {
+      // C button is pressed.
+      this.strPressC(nun1);
+      this.strPressC(nun2);
+    } else {
+      this.pluckPressC(nun1);
+      this.pluckPressC(nun2);
+    }
 
-//     setTimeout(() => {
-//       this.nunchuckLoop();
-//     }, 10);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
+    setTimeout(() => {
+      this.nunchuckLoop();
+    }, 10);
+  } catch (error) {
+    console.error(error);
+  }
+}
+*/

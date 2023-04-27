@@ -1,3 +1,7 @@
 {
     'liveServer.settings.port': 5501
+
+    "code-runner.executorMap": {
+        "python": "python3 -u",
+    }
 }

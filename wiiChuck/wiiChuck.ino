@@ -18,7 +18,7 @@ Accessory nunchuck2;
 unsigned long startTime = 0;
 unsigned long elapsedTime = 0;
 
-#define SERIAL_DELAY 17     // Total delay time of loop.
+#define SERIAL_DELAY 10     // Total delay time of loop.
 #define TCADDR 0x70        // I2C bus address.
 
 void setup() {
@@ -79,5 +79,5 @@ void loop() {
   float delayTime = SERIAL_DELAY - elapsedTime;
 
   // Delay so that data is transmitted every 17ms.
-  delay(delayTime);
+  delay(10);
 }

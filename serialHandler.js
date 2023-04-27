@@ -2,10 +2,10 @@
 class SerialHandler {
   constructor() {
     // Create encoder and decoder objects.
+    // Convert between strings and Uint8Arrays (arrays of 8-bit unsigned integers).
     this.encoder = new TextEncoder();
     this.decoder = new TextDecoder();
   }
-  
   // Initialize serial communication.
   async init() {
     // Check if serial is available.
@@ -23,7 +23,7 @@ class SerialHandler {
           // Open the port with the specified baud rate.
           await port.open({ baudRate: 115200 });
           // Get writable and readable streams.
-          this.writer = port.writable.getWriter();
+          // this.writer = port.writable.getWriter();
           this.reader = port.readable.getReader();
           // Get signal states.
           const signals = await port.getSignals();
@@ -40,18 +40,18 @@ class SerialHandler {
     }
   }
   
-  // Write data to the serial port.
-  async write(data) {
-    // Encode data as a Uint8Array.
-    const dataArrayBuffer = this.encoder.encode(data);
-    // Write data to the port and return the number of bytes written.
-    return await this.writer.write(dataArrayBuffer);
-  }
+  // // Write data to the serial port.
+  // async write(data) {
+  //   // Encode data as a Uint8Array.
+  //   const dataArrayBuffer = this.encoder.encode(data);
+  //   // Write data to the port and return the number of bytes written.
+  //   return await this.writer.write(dataArrayBuffer);
+  // }
   
-  // Read data from the serial port.
+  // Read data from serial port.
   async read() {
     try {
-      // Read data from the port and decode it into a string.
+      // Read data from serial port and decode it into a string.
       const readerData = await this.reader.read();
       return this.decoder.decode(readerData.value);
     } catch (err) {

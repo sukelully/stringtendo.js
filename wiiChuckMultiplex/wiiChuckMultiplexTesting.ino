@@ -18,8 +18,9 @@ Accessory nunchuck2;
 unsigned long startTime = 0;
 unsigned long elapsedTime = 0;
 
-#define SERIAL_DELAY 17     // Total delay time of loop.
-#define TCADDR 0x70        // I2C bus address.
+#define TCADDR 0x70         // I2C bus address.
+#define NUM_TRIALS 1000     // Number of trials to run.
+#define SERIAL_DELAY 17   // Total delay time of loop.
 
 void setup() {
 	Serial.begin(115200);
@@ -38,8 +39,15 @@ void setup() {
 }
 
 void loop() {
+  // Define variables for trial counter and elapsed time array.
+  static int trial = 0;
+  static int i2cErrorCount = 0;
+  static unsigned long trialTimes[NUM_TRIALS];
+
   // Start timer.
   startTime = millis();
+
+  /**********************************************************************/
 
   // Read inputs and update maps.
 	nunchuck1.readData();
@@ -74,10 +82,56 @@ void loop() {
   Serial.println(nunchuck2.getJoyY());
   Serial.println("");
 
-  // Stop timer and calculate delayTime.
-  elapsedTime = millis() - startTime;
-  float delayTime = SERIAL_DELAY - elapsedTime;
+  /**********************************************************************/
 
-  // Delay so that data is transmitted every 17ms.
-  delay(delayTime);
+  // Stop timer and store elapsed time in array.
+  elapsedTime = millis() - startTime;
+  trialTimes[trial] = elapsedTime;
+
+  // Search serial output for "I2C" string and count occurrences.
+  while (Serial.available()) {
+    if (Serial.find("I2C")) {
+      i2cErrorCount++;
+    }
+  }
+
+  // Increment trial counter.
+  trial++;
+
+  // If all trials have been completed, calculate and print statistics.
+  if (trial >= NUM_TRIALS) {
+    unsigned long minTime = trialTimes[0];
+    unsigned long maxTime = trialTimes[0];
+    unsigned long totalTime = 0;
+
+    // Calculate minimum, maximum, and total elapsed times.
+    for (int i = 0; i < NUM_TRIALS; i++) {
+      minTime = min(minTime, trialTimes[i]);
+      maxTime = max(maxTime, trialTimes[i]);
+      totalTime += trialTimes[i];
+    }
+
+    // Calculate average elapsed time.
+    float avgTime = (float)totalTime / NUM_TRIALS;
+
+    // Print statistics to serial monitor.
+    Serial.print("Elapsed time statistics (");
+    Serial.print(NUM_TRIALS);
+    Serial.println(" trials):");
+    Serial.print("  Minimum (ms): ");
+    Serial.println(minTime);
+    Serial.print("  Maximum (ms): ");
+    Serial.println(maxTime);
+    Serial.print("  Average (ms): ");
+    Serial.println(avgTime);
+    Serial.print("  I2C Error Count: ");
+    Serial.println(i2cErrorCount);
+
+    // Exit loop.
+    while (true) {}
+  }
+
+  float calcDelay = SERIAL_DELAY - elapsedTime;
+
+  delay(calcDelay);    // Same time delay as main nunchuck.js loop.
 }

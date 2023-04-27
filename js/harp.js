@@ -10,7 +10,7 @@ class Harp {
             this[`string${i}`] = new String();
             this[`string${i}b`] = new String();
         }
-
+        
         this.effectsChain = new EffectsChain();
         this.output = new Tone.getDestination();
 
@@ -34,8 +34,11 @@ class Harp {
 
         // Toggle filter event listner.
         this.toggleFilterButton = document.getElementById('toggle-filter-button').addEventListener('click', (event) => {
+            for (let i = 1; i <= 8; i++) {
+                this.effectsChain.toggleFilter(this[`string${i}`].outputGain, this.output);
+                this.effectsChain.toggleFilter(this[`string${i}b`].outputGain, this.output);
+            }
             this.effectsChain.filterIsConnected = !this.effectsChain.filterIsConnected;
-            console.log(`filter on: ${this.effectsChain.filterIsConnected}`);
 
             if (this.effectsChain.filterIsConnected) {
                 event.target.style.backgroundColor = '#04AA6D';
@@ -46,12 +49,11 @@ class Harp {
 
         // Toggle delay event listener.
         this.toggleDelayButton = document.getElementById('toggle-delay-button').addEventListener('click', (event) => {
-            // for (let i = 1; i <= 8; i++) {
-            //     this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
-            //     this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
-            // }
+            for (let i = 1; i <= 8; i++) {
+                this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
+                this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
+            }
             this.effectsChain.delayIsConnected = !this.effectsChain.delayIsConnected;
-            console.log(`delay on: ${this.effectsChain.delayIsConnected}`);
 
             if (this.effectsChain.delayIsConnected) {
                 event.target.style.backgroundColor = '#04AA6D';
@@ -62,12 +64,11 @@ class Harp {
 
         // Toggle reverb event listener.
         this.toggleReverbButton = document.getElementById('toggle-reverb-button').addEventListener('click', (event) => {
-            // for (let i = 1; i <= 8; i++) {
-            //     this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
-            //     this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
-            // }
+            for (let i = 1; i <= 8; i++) {
+                this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
+                this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
+            }
             this.effectsChain.reverbIsConnected = !this.effectsChain.reverbIsConnected;
-            console.log(`reverb on: ${this.effectsChain.reverbIsConnected}`);
 
             if (this.effectsChain.reverbIsConnected) {
                 event.target.style.backgroundColor = '#04AA6D';
@@ -104,7 +105,7 @@ class Harp {
         setTimeout(() => {
             this[`string${stringA}`].playFreq(chromScale[note]);
             this[`string${stringA}`].isPlaying = true;
-        }, 50);
+        }, 25);
     }
 
     // Mutes all strings.

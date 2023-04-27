@@ -26,21 +26,30 @@ class BassHarp {
             this.muteStrings();
         });
 
+        // Toggle filter event listner.
+        this.toggleFilterButton = document.getElementById('toggle-filter-button').addEventListener('click', (event) => {
+            for (let i = 1; i <= 8; i++) {
+                this.effectsChain.toggleFilter(this[`string${i}`].outputGain, this.output);
+                this.effectsChain.toggleFilter(this[`string${i}b`].outputGain, this.output);
+            }
+            this.effectsChain.filterIsConnected = !this.effectsChain.filterIsConnected;
+        });
+
         // Toggle delay event listener.
         this.toggleDelayButton = document.getElementById('toggle-delay-button').addEventListener('click', () => {
-            // for (let i = 1; i <= 8; i++) {
-            //     this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
-            //     this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
-            // }
+            for (let i = 1; i <= 8; i++) {
+                this.effectsChain.toggleDelay(this[`string${i}`].outputGain, this.output);
+                this.effectsChain.toggleDelay(this[`string${i}b`].outputGain, this.output);
+            }
             this.effectsChain.delayIsConnected = !this.effectsChain.delayIsConnected;
         });
 
         // Toggle reverb event listener.
         this.toggleReverbButton = document.getElementById('toggle-reverb-button').addEventListener('click', () => {
-            // for (let i = 1; i <= 8; i++) {
-            //     this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
-            //     this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
-            // }
+            for (let i = 1; i <= 8; i++) {
+                this.effectsChain.toggleReverb(this[`string${i}`].outputGain, this.output);
+                this.effectsChain.toggleReverb(this[`string${i}b`].outputGain, this.output);
+            }
             this.effectsChain.reverbIsConnected = !this.effectsChain.reverbIsConnected;;
         });
     }
@@ -97,29 +106,32 @@ class BassHarp {
     }
 
     playHarp(joy_X, joy_Y, intensity) {
-        if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
+        if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) { 
+            console.log("stringtendo bass pluck");       // South.
             this.swapString('1', '1b', 'C2', intensity);                                     
         }
-        if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
+        else if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
             this.swapString('2', '2b', 'D2', intensity);  
         }
-        if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
+        else if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
             this.swapString('3', '3b', 'E2', intensity); 
         }
-        if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
+        else if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
             this.swapString('4', '4b', 'F2', intensity); 
         }
-        if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
+        else if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
             this.swapString('5', '5b', 'G2', intensity); 
         }
-        if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
+        else if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
             this.swapString('6', '6b', 'A2', intensity); 
         }
-        if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
+        else if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
             this.swapString('7', '7b', 'B2', intensity); 
         }
-        if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
+        else if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
             this.swapString('8', '8b', 'C3', intensity);
+        } else {
+            console.log("none true");
         }
     }
 }
