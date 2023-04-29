@@ -107,7 +107,6 @@ class BassHarp {
 
     playHarp(joy_X, joy_Y, intensity) {
         if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) { 
-            console.log("stringtendo bass pluck");       // South.
             this.swapString('1', '1b', 'C2', intensity);                                     
         }
         else if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.

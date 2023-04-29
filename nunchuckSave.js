@@ -149,15 +149,11 @@ class Nunchuck {
         // console.log(`nun2 c: ${nun2.butC}`);
       }
 
-      // if (this.stringtendo) {
-      //   // Calculate rate of change of both controllers.
-      //   this.calcRateOfChange(nun1);
-      //   this.calcRateOfChange(nun2);
-      // }
-
-      // // // Update the RoC calculations and button presses.
-      // this.calcRateOfChange(nun1);
-      // this.calcRateOfChange(nun2);
+      if (this.stringtendo) {
+        // Calculate rate of change of both controllers.
+        this.calcRateOfChange(nun1);
+        this.calcRateOfChange(nun2);
+      }
 
       if (this.easyMode) {
         if (this.stringtendo) {
@@ -186,202 +182,232 @@ class Nunchuck {
   }
 
 
-pluckPressC(nunchuck) {
-  if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
-    if (nunchuck == nun1) pluckSynth.playHarp(nunchuck.joyX, nunchuck.joyY);
-    if (nunchuck == nun2) bassPluckSynth.playHarp(nunchuck.joyX, nunchuck.joyY);
-  }
-
-  // Update the button C state.
-  nunchuck.statButC = nunchuck.butC;
-  }
-
-// C button is pressed.
-strPressC(nunchuck) {
-  // Check if value of C has changed from 0 to 1.
-  if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
-    // Play note on harp if C button has changed from 0 to 1.
-    const intensity = this.scaleIntensity(nunchuck.accAvgRoc);
-    // console.log(`intensity: ${intensity}`)
-    // console.log(intensity);
-    if (nunchuck == nun1) harp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);
-    if (nunchuck == nun2) bassHarp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);      
-    // console.log(nunchuck.accAvgRoc);
-  }
-
-  // Update the button C state.
-  nunchuck.statButC = nunchuck.butC;
-}
-
-strHandleNote(nun1, note, octave, intensity) {
-  if (nun1.statButC == 0 && nun1.butC == 1) {
-    switch (note) {
-      case 'C3':
-        string1 = '1';
-        string2 = '1b';
-      default:
-        break
+  pluckPressC(nunchuck) {
+    if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
+      if (nunchuck == nun1) pluckSynth.playHarp(nunchuck.joyX, nunchuck.joyY);
+      if (nunchuck == nun2) bassPluckSynth.playHarp(nunchuck.joyX, nunchuck.joyY);
     }
 
-    this.swapString(string1, string2, `${note}${octave}`, intensity);
+    // Update the button C state.
+    nunchuck.statButC = nunchuck.butC;
   }
-}
 
-begStrPressC(nun1, nun2) {
-  const zones = [
-    { xRange: [106, 146], yRange: [8, 48], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C2' },
-    { xRange: [38, 78], yRange: [38, 78], notes: ['D', 'F', 'A', 'D', 'D'], bassNote: 'D2' },
-    { xRange: [178, 218], yRange: [36, 76], notes: ['E', 'G', 'B', 'E', 'E'], bassNote: 'E2' },
-    { xRange: [6, 46], yRange: [106, 146], notes: ['F', 'A', 'C', 'F', 'F'], bassNote: 'F2' },
-    { xRange: [206, 246], yRange: [106, 146], notes: ['G', 'B', 'D', 'G', 'G'], bassNote: 'G2' },
-    { xRange: [35, 75], yRange: [186, 226], notes: ['A', 'C', 'E', 'A', 'A'], bassNote: 'A2' },
-    { xRange: [180, 220], yRange: [186, 226], notes: ['B', 'D', 'F', 'B', 'B'], bassNote: 'B2' },
-    { xRange: [106, 146], yRange: [206, 246], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C3' }
-  ];
+  // C button is pressed.
+  strPressC(nunchuck) {
+    // Check if value of C has changed from 0 to 1.
+    if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
+      // Play note on harp if C button has changed from 0 to 1.
+      const intensity = this.scaleIntensity(nunchuck.accAvgRoc);
+      // console.log(`intensity: ${intensity}`)
+      if (nunchuck == nun1) harp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);
+      if (nunchuck == nun2) bassHarp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);      
+      // console.log(nunchuck.accAvgRoc);
+    }
 
-  for (const zone of zones) {
-    // const intensity = this.scaleIntensity(nun1.accAvgRoc);
-    const intensity = 5000;
+    // Update the button C state.
+    nunchuck.statButC = nunchuck.butC;
+  }
 
-    if (this.isInZone(nun2.joyX, nun2.joyY, ...zone.xRange, ...zone.yRange)) {
-      const [noteS, noteW, noteE, noteN, randomNote] = zone.notes;
+  strHandleNote(nun1, note, octave, intensity) {
+    var string1;
+    var string2;
 
-      if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 8, 48)) this.strHandleNote(nun1, noteS, 3, intensity);
-      // else if (this.isInZone(nun1.joyX, nun1.joyY, 6, 46, 106, 146)) handleNote(nun1, noteW, 3);
-      // else if (this.isInZone(nun1.joyX, nun1.joyY, 206, 246, 106, 146)) handleNote(nun1, noteE, 3);
-      // else if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 206, 246)) handleNote(nun1, noteN, 4);
-      // else handleNote(nun1, this.getRandomNote(randomNote), 3);
+    if (octave == 4 && note == 'C') {
+      octave = 4;
+    } else {
+      octave = 3;
+    }
 
-      if (nun2.statButC == 0 && nun2.butC == 1) {
-        // bassPluckSynth.pluckSynth.triggerAttack(zone.bassNote);
-        bassHarp.playHarp(nun2.joyX, nun2.joyY, intensity);
+    if (nun1.statButC == 0 && nun1.butC == 1) {
+      switch (note) {
+        case 'C':
+          string1 = '1';
+          string2 = '1b';
+        case 'D':
+          string1 = '2';
+          string2 = '2b';
+        case 'E':
+          string1 = '3';
+          string2 = '3b';
+        case 'F':
+          string1 = '4';
+          string2 = '4b';
+        case 'G':
+          string1 = '5';
+          string2 = '5b';
+        case 'A':
+          string1 = '6';
+          string2 = '6b';
+        case 'B':
+          string1 = '7';
+          string2 = '7b';
+        default:
+          break
       }
-      break;
+      harp.swapString(`${string2}`, `${string1}`, `${note}${octave}`, intensity);
     }
   }
 
-  // Update the button C state.
-  nun1.statButC = nun1.butC;
-  nun2.statButC = nun2.butC;
-}
+  begStrPressC(nun1, nun2) {
+    const zones = [
+      { xRange: [106, 146], yRange: [8, 48], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C2' },
+      { xRange: [38, 78], yRange: [38, 78], notes: ['D', 'F', 'A', 'D', 'D'], bassNote: 'D2' },
+      { xRange: [178, 218], yRange: [36, 76], notes: ['E', 'G', 'B', 'E', 'E'], bassNote: 'E2' },
+      { xRange: [6, 46], yRange: [106, 146], notes: ['F', 'A', 'C', 'F', 'F'], bassNote: 'F2' },
+      { xRange: [206, 246], yRange: [106, 146], notes: ['G', 'B', 'D', 'G', 'G'], bassNote: 'G2' },
+      { xRange: [35, 75], yRange: [186, 226], notes: ['A', 'C', 'E', 'A', 'A'], bassNote: 'A2' },
+      { xRange: [180, 220], yRange: [186, 226], notes: ['B', 'D', 'F', 'B', 'B'], bassNote: 'B2' },
+      { xRange: [106, 146], yRange: [206, 246], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C3' }
+    ];
 
-// // Plays notes with joystick.
-// playHarp(joy_X, joy_Y, intensity) {
-//   if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
-//       this.swapString('1', '1b', 'C3', intensity);                                     
-//   }
-//   if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
-//       this.swapString('2', '2b', 'D3', intensity);  
-//   }
-//   if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
-//       this.swapString('3', '3b', 'E3', intensity); 
-//   }
-//   if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
-//       this.swapString('4', '4b', 'F3', intensity); 
-//   }
-//   if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
-//       this.swapString('5', '5b', 'G3', intensity); 
-//   }
-//   if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
-//       this.swapString('6', '6b', 'A3', intensity); 
-//   }
-//   if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
-//       this.swapString('7', '7b', 'B3', intensity); 
-//   }
-//   if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
-//       this.swapString('8', '8b', 'C4', intensity);
-//   }
-// }
+    for (const zone of zones) {
+      const intensity1 = this.scaleIntensity(nun1.accAvgRoc);
+      const intensity2 = this.scaleIntensity(nun2.accAvgRoc);
 
-isInZone(x, y, minX, maxX, minY, maxY) {
-  return minX <= x && x <= maxX && minY <= y && y <= maxY;
-}
+      if (this.isInZone(nun2.joyX, nun2.joyY, ...zone.xRange, ...zone.yRange)) {
+        const [noteS, noteW, noteE, noteN, randomNote] = zone.notes;
 
-handleNote(nun1, note, octave) {
-  if (nun1.statButC == 0 && nun1.butC == 1) {
-    pluckSynth.pluckSynth.triggerAttack(`${note}${octave}`);
-  }
-}
+        if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 8, 48))         this.strHandleNote(nun1, noteS, 3, intensity1);
+        else if (this.isInZone(nun1.joyX, nun1.joyY, 6, 46, 106, 146))    this.strHandleNote(nun1, noteW, 3, intensity1);
+        else if (this.isInZone(nun1.joyX, nun1.joyY, 206, 246, 106, 146)) this.strHandleNote(nun1, noteE, 3, intensity1);
+        else if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 206, 246)) this.strHandleNote(nun1, noteN, 4, intensity1);
+        else this.strHandleNote(nun1, this.getRandomNote(randomNote), 3, intensity1);
 
-getRandomNote(scale) {
-  const arpeggios = {
-  C: ['C', 'E', 'G'],
-  D: ['D', 'F', 'A'],
-  E: ['E', 'G', 'B'],
-  F: ['F', 'A', 'C'],
-  G: ['G', 'B', 'D'],
-  A: ['A', 'C', 'E'],
-  B: ['B', 'D', 'F']
-  };
-  const letters = arpeggios[scale];
-  const randomIndex = Math.floor(Math.random() * letters.length);
-  return letters[randomIndex];
-}
-
-begPressC(nun1, nun2) {
-  const zones = [
-    { xRange: [106, 146], yRange: [8, 48], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C2' },
-    { xRange: [38, 78], yRange: [38, 78], notes: ['D', 'F', 'A', 'D', 'D'], bassNote: 'D2' },
-    { xRange: [178, 218], yRange: [36, 76], notes: ['E', 'G', 'B', 'E', 'E'], bassNote: 'E2' },
-    { xRange: [6, 46], yRange: [106, 146], notes: ['F', 'A', 'C', 'F', 'F'], bassNote: 'F2' },
-    { xRange: [206, 246], yRange: [106, 146], notes: ['G', 'B', 'D', 'G', 'G'], bassNote: 'G2' },
-    { xRange: [35, 75], yRange: [186, 226], notes: ['A', 'C', 'E', 'A', 'A'], bassNote: 'A2' },
-    { xRange: [180, 220], yRange: [186, 226], notes: ['B', 'D', 'F', 'B', 'B'], bassNote: 'B2' },
-    { xRange: [106, 146], yRange: [206, 246], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C3' }
-  ];
-
-  for (const zone of zones) {
-    if (this.isInZone(nun2.joyX, nun2.joyY, ...zone.xRange, ...zone.yRange)) {
-      // const [noteS, noteSW, noteW, noteNW, noteN, noteNE, noteE, noteSE, randomNote] = zone.notes;
-      const [noteS, noteW, noteE, noteN, randomNote] = zone.notes;
-
-      if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 8, 48)) this.handleNote(nun1, noteS, 3);          // S.
-      else if (this.isInZone(nun1.joyX, nun1.joyY, 6, 46, 106, 146)) this.handleNote(nun1, noteW, 3);     // W.
-      else if (this.isInZone(nun1.joyX, nun1.joyY, 206, 246, 106, 146)) this.handleNote(nun1, noteE, 3);  // E.
-      else if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 206, 246)) this.handleNote(nun1, noteN, 3);  // N.
-      else this.handleNote(nun1, this.getRandomNote(randomNote), 3);
-
-      if (nun2.statButC == 0 && nun2.butC == 1) {
-        bassPluckSynth.pluckSynth.triggerAttack(zone.bassNote);
+        if (nun2.statButC == 0 && nun2.butC == 1) {
+          bassHarp.playHarp(nun2.joyX, nun2.joyY, intensity2);
+          console.log(nun2.accAvgRoc);
+        }
+        break;
       }
-      break;
+    }
+
+    // Update the button C state.
+    nun1.statButC = nun1.butC;
+    nun2.statButC = nun2.butC;
+  }
+
+  isInZone(x, y, minX, maxX, minY, maxY) {
+    return minX <= x && x <= maxX && minY <= y && y <= maxY;
+  }
+
+  handleNote(nun1, note, octave) {
+    if (nun1.statButC == 0 && nun1.butC == 1) {
+      pluckSynth.pluckSynth.triggerAttack(`${note}${octave}`);
     }
   }
 
-  // Update the button C state.
-  nun1.statButC = nun1.butC;
-  nun2.statButC = nun2.butC;
+  getRandomNote(scale) {
+    const arpeggios = {
+    C: ['C', 'E', 'G'],
+    D: ['D', 'F', 'A'],
+    E: ['E', 'G', 'B'],
+    F: ['F', 'A', 'C'],
+    G: ['G', 'B', 'D'],
+    A: ['A', 'C', 'E'],
+    B: ['B', 'D', 'F']
+    };
+    const letters = arpeggios[scale];
+    const randomIndex = Math.floor(Math.random() * letters.length);
+    return letters[randomIndex];
+  }
+
+  begPressC(nun1, nun2) {
+    const zones = [
+      { xRange: [106, 146], yRange: [8, 48], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C2' },
+      { xRange: [38, 78], yRange: [38, 78], notes: ['D', 'F', 'A', 'D', 'D'], bassNote: 'D2' },
+      { xRange: [178, 218], yRange: [36, 76], notes: ['E', 'G', 'B', 'E', 'E'], bassNote: 'E2' },
+      { xRange: [6, 46], yRange: [106, 146], notes: ['F', 'A', 'C', 'F', 'F'], bassNote: 'F2' },
+      { xRange: [206, 246], yRange: [106, 146], notes: ['G', 'B', 'D', 'G', 'G'], bassNote: 'G2' },
+      { xRange: [35, 75], yRange: [186, 226], notes: ['A', 'C', 'E', 'A', 'A'], bassNote: 'A2' },
+      { xRange: [180, 220], yRange: [186, 226], notes: ['B', 'D', 'F', 'B', 'B'], bassNote: 'B2' },
+      { xRange: [106, 146], yRange: [206, 246], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C3' }
+    ];
+
+    for (const zone of zones) {
+      if (this.isInZone(nun2.joyX, nun2.joyY, ...zone.xRange, ...zone.yRange)) {
+        // const [noteS, noteSW, noteW, noteNW, noteN, noteNE, noteE, noteSE, randomNote] = zone.notes;
+        const [noteS, noteW, noteE, noteN, randomNote] = zone.notes;
+
+        if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 8, 48))         this.handleNote(nun1, noteS, 3);  // S.
+        else if (this.isInZone(nun1.joyX, nun1.joyY, 6, 46, 106, 146))    this.handleNote(nun1, noteW, 3);  // W.
+        else if (this.isInZone(nun1.joyX, nun1.joyY, 206, 246, 106, 146)) this.handleNote(nun1, noteE, 3);  // E.
+        else if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 206, 246)) this.handleNote(nun1, noteN, 3);  // N.
+        else this.handleNote(nun1, this.getRandomNote(randomNote), 3);
+
+        if (nun2.statButC == 0 && nun2.butC == 1) {
+          bassPluckSynth.pluckSynth.triggerAttack(zone.bassNote);
+        }
+        break;
+      }
+    }
+
+    // Update the button C state.
+    nun1.statButC = nun1.butC;
+    nun2.statButC = nun2.butC;
+  }
+
+  calcRateOfChange(nunchuck) {
+    const currentTime = performance.now();
+
+    // Calculate the rate of change of all three accelerometer values
+    nunchuck.accX_RoC = (nunchuck.accX - nunchuck.initAccX);
+    nunchuck.accY_RoC = (nunchuck.accY - nunchuck.initAccY);
+    nunchuck.accZ_RoC = (nunchuck.accZ - nunchuck.initAccZ);
+    nunchuck.accAvgRoc = (nunchuck.accX_RoC + nunchuck.accY_RoC + nunchuck.accZ_RoC) / 3;
+
+    // Update initial values if 100ms has elapsed since last update
+    if (currentTime - nunchuck.lastUpdateTime >= 100) {
+        nunchuck.initAccX = nunchuck.accX;
+        nunchuck.initAccY = nunchuck.accY;
+        nunchuck.initAccZ = nunchuck.accZ;
+        nunchuck.lastUpdateTime = currentTime;
+    }
+
+    if (nunchuck.accAvgRoc < 0) nunchuck.accAvgRoc *= -1;
+
+    // console.log(`avg RoC: ${nunchuck.accAvgRoc}`);
+    // console.log(`accX: ${nunchuck.accX}`);
+    // console.log(`init accX: ${nunchuck.initAccX}`);
 }
-
-
-calcRateOfChange(nunchuck) {
-  const currentTime = performance.now();
-  
-  // Update initial values if 100ms has elapsed since last update
-  if (currentTime - nunchuck.lastUpdateTime >= 100) {
-    nunchuck.initAccX = nunchuck.accX;
-    nunchuck.initAccY = nunchuck.accY;
-    nunchuck.initAccZ = nunchuck.accZ;
-    nunchuck.lastUpdateTime = currentTime;
-  }
-  
-  // Calculate the rate of change of all three accelerometer values
-  nunchuck.accX_RoC = (nunchuck.accX - nunchuck.initAccX);
-  nunchuck.accY_RoC = (nunchuck.accY - nunchuck.initAccY);
-  nunchuck.accZ_RoC = (nunchuck.accZ - nunchuck.initAccZ);
-  nunchuck.accAvgRoc = (nunchuck.accX_RoC + nunchuck.accY_RoC + nunchuck.accZ_RoC) / 3;
-  if (nunchuck.accAvgRoc < 0) nunchuck.accAvgRoc *= -1;
-  // console.log(nunchuck.accAvgRoc);
-  }
 
   // Scales the average rate of change of all accelerometer values
   // to be in a suitable range for the frequency of the loop filter.
   // High 500.
   // Low 0.
   scaleIntensity(RoC) {
-    return (RoC / 500) * 8000 + 1000;
+    // if (RoC < 20) RoC = 20;
+    return (RoC / 500) * 8000 + 500;
   }
 }
 
 // Create nunchuck object.
 const nunchuck = new Nunchuck();
+
+  // calcRateOfChange(nunchuck) {
+  //   const currentTime = performance.now();
+    
+  //   // Update initial values if 100ms has elapsed since last update
+  //   if (currentTime - nunchuck.lastUpdateTime >= 100) {
+  //     nunchuck.initAccX = nunchuck.accX;
+  //     nunchuck.initAccY = nunchuck.accY;
+  //     nunchuck.initAccZ = nunchuck.accZ;
+  //     nunchuck.lastUpdateTime = currentTime;
+  //   }
+    
+  //   // Calculate the rate of change of all three accelerometer values
+  //   nunchuck.accX_RoC = (nunchuck.accX - nunchuck.initAccX);
+  //   nunchuck.accY_RoC = (nunchuck.accY - nunchuck.initAccY);
+  //   nunchuck.accZ_RoC = (nunchuck.accZ - nunchuck.initAccZ);
+  //   nunchuck.accAvgRoc = (nunchuck.accX_RoC + nunchuck.accY_RoC + nunchuck.accZ_RoC) / 3;
+  //   if (nunchuck.accAvgRoc < 0) nunchuck.accAvgRoc *= -1;
+  //   console.log(nunchuck.accAvgRoc);
+  //   }
+
+  //   // Scales the average rate of change of all accelerometer values
+  //   // to be in a suitable range for the frequency of the loop filter.
+  //   // High 500.
+  //   // Low 0.
+  //   scaleIntensity(RoC) {
+  //     return (RoC / 500) * 8000 + 1000;
+  //   }
+  // }
