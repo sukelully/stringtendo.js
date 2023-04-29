@@ -72,7 +72,7 @@ class Nunchuck {
     });
 
     this.stringTest = new String();
-    this.stringtendo = false;
+    this.stringtendo = true;
     this.serialDisplay = false;
     this.easyMode = true;
     this.lastExecutionTime = 0;
@@ -120,44 +120,16 @@ class Nunchuck {
   // Extract controller data from serial message, listen for button presses and calculate rate of change.
   async nunchuckLoop() {
     try {
-      // // Read serial data when it is received.
-      // const dataLine1 = await serialHandler.read();
-      // const parsedNun1 = serialHandler.parseData(dataLine1);
-
-      // if (parsedNun1.id === 'nun1') {
-      //   nun1.accX = parsedNun1.accelX;
-      //   nun1.accY = parsedNun1.accelY;
-      //   nun1.accZ = parsedNun1.accelZ;
-      //   nun1.butZ = parsedNun1.buttonZ;
-      //   nun1.butC = parsedNun1.buttonC;
-      //   nun1.joyX = parsedNun1.joyX;
-      //   nun1.joyY = parsedNun1.joyY;
-      // }
-      // const dataLine2 = await serialHandler.read();
-      // const parsedNun2 = serialHandler.parseData(dataLine2);
-      // if (parsedNun2.id === 'nun2')
-      // {
-      //   nun2.accX = parsedNun2.accelX;
-      //   nun2.accY = parsedNun2.accelY;
-      //   nun2.accZ = parsedNun2.accelZ;
-      //   nun2.butZ = parsedNun2.buttonZ;
-      //   nun2.butC = parsedNun2.buttonC;
-      //   nun2.joyX = parsedNun2.joyX;
-      //   nun2.joyY = parsedNun2.joyY;
-      // }
-      // Read serial data when it is received.
-      // Read serial data when it is received.
+      // Read serial and split data into two variables.
       const data = await serialHandler.read();
-
       if (data.includes(";")) {
         const [data1, data2] = data.split(";");
 
+        // Parse each variable into variables.
         const parsedNun1 = serialHandler.parseData(data1);
         const parsedNun2 = serialHandler.parseData(data2);
 
-        // console.log(parsedNun1);
-        // console.log(parsedNun2);
-
+        // Assign local variables to global ones.
         nun1.accX = parsedNun1.accelX;
         nun1.accY = parsedNun1.accelY;
         nun1.accZ = parsedNun1.accelZ;
@@ -165,7 +137,7 @@ class Nunchuck {
         nun1.butC = parsedNun1.buttonC;
         nun1.joyX = parsedNun1.joyX;
         nun1.joyY = parsedNun1.joyY;
-        console.log(`nun1 c: ${nun1.butC}`);
+        // console.log(`nun1 c: ${nun1.butC}`);
 
         nun2.accX = parsedNun2.accelX;
         nun2.accY = parsedNun2.accelY;
@@ -174,7 +146,7 @@ class Nunchuck {
         nun2.butC = parsedNun2.buttonC;
         nun2.joyX = parsedNun2.joyX;
         nun2.joyY = parsedNun2.joyY;
-        console.log(`nun2 c: ${nun2.butC}`);
+        // console.log(`nun2 c: ${nun2.butC}`);
       }
 
       // if (this.stringtendo) {
@@ -188,8 +160,12 @@ class Nunchuck {
       // this.calcRateOfChange(nun2);
 
       if (this.easyMode) {
-        this.begPressC(nun1, nun2);
-        // this.begPressC(nun1);
+        if (this.stringtendo) {
+          // C button is pressed.
+          this.begStrPressC(nun1, nun2);
+        } else {
+          this.begPressC(nun1, nun2);
+        }
       } else {
         if (this.stringtendo) {
           // C button is pressed.
@@ -203,7 +179,7 @@ class Nunchuck {
 
     setTimeout(() => {
         this.nunchuckLoop();
-      }, 100);
+      }, 50);
     } catch (error) {
       console.error(error);
     }
@@ -237,6 +213,86 @@ strPressC(nunchuck) {
   nunchuck.statButC = nunchuck.butC;
 }
 
+strHandleNote(nun1, note, octave, intensity) {
+  if (nun1.statButC == 0 && nun1.butC == 1) {
+    switch (note) {
+      case 'C3':
+        string1 = '1';
+        string2 = '1b';
+      default:
+        break
+    }
+
+    this.swapString(string1, string2, `${note}${octave}`, intensity);
+  }
+}
+
+begStrPressC(nun1, nun2) {
+  const zones = [
+    { xRange: [106, 146], yRange: [8, 48], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C2' },
+    { xRange: [38, 78], yRange: [38, 78], notes: ['D', 'F', 'A', 'D', 'D'], bassNote: 'D2' },
+    { xRange: [178, 218], yRange: [36, 76], notes: ['E', 'G', 'B', 'E', 'E'], bassNote: 'E2' },
+    { xRange: [6, 46], yRange: [106, 146], notes: ['F', 'A', 'C', 'F', 'F'], bassNote: 'F2' },
+    { xRange: [206, 246], yRange: [106, 146], notes: ['G', 'B', 'D', 'G', 'G'], bassNote: 'G2' },
+    { xRange: [35, 75], yRange: [186, 226], notes: ['A', 'C', 'E', 'A', 'A'], bassNote: 'A2' },
+    { xRange: [180, 220], yRange: [186, 226], notes: ['B', 'D', 'F', 'B', 'B'], bassNote: 'B2' },
+    { xRange: [106, 146], yRange: [206, 246], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C3' }
+  ];
+
+  for (const zone of zones) {
+    // const intensity = this.scaleIntensity(nun1.accAvgRoc);
+    const intensity = 5000;
+
+    if (this.isInZone(nun2.joyX, nun2.joyY, ...zone.xRange, ...zone.yRange)) {
+      const [noteS, noteW, noteE, noteN, randomNote] = zone.notes;
+
+      if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 8, 48)) this.strHandleNote(nun1, noteS, 3, intensity);
+      // else if (this.isInZone(nun1.joyX, nun1.joyY, 6, 46, 106, 146)) handleNote(nun1, noteW, 3);
+      // else if (this.isInZone(nun1.joyX, nun1.joyY, 206, 246, 106, 146)) handleNote(nun1, noteE, 3);
+      // else if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 206, 246)) handleNote(nun1, noteN, 4);
+      // else handleNote(nun1, this.getRandomNote(randomNote), 3);
+
+      if (nun2.statButC == 0 && nun2.butC == 1) {
+        // bassPluckSynth.pluckSynth.triggerAttack(zone.bassNote);
+        bassHarp.playHarp(nun2.joyX, nun2.joyY, intensity);
+      }
+      break;
+    }
+  }
+
+  // Update the button C state.
+  nun1.statButC = nun1.butC;
+  nun2.statButC = nun2.butC;
+}
+
+// // Plays notes with joystick.
+// playHarp(joy_X, joy_Y, intensity) {
+//   if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.
+//       this.swapString('1', '1b', 'C3', intensity);                                     
+//   }
+//   if (38 <= joy_X && joy_X <= 78 && 38 <= joy_Y && joy_Y <= 78) {         // South-West.
+//       this.swapString('2', '2b', 'D3', intensity);  
+//   }
+//   if (178 <= joy_X && joy_X <= 218 && 36 <= joy_Y && joy_Y <= 76) {       // South-East.
+//       this.swapString('3', '3b', 'E3', intensity); 
+//   }
+//   if (6 <= joy_X && joy_X <= 46 && 106 <= joy_Y && joy_Y <= 146) {        // West.
+//       this.swapString('4', '4b', 'F3', intensity); 
+//   }
+//   if (206 <= joy_X && joy_X <= 246 && 106 <= joy_Y && joy_Y <= 146) {     // East;
+//       this.swapString('5', '5b', 'G3', intensity); 
+//   }
+//   if (35 <= joy_X && joy_X <= 75 && 186 <= joy_Y && joy_Y <= 226) {       // North-West.
+//       this.swapString('6', '6b', 'A3', intensity); 
+//   }
+//   if (180 <= joy_X && joy_X <= 220 && 186 <= joy_Y && joy_Y <= 226) {     // North-East.
+//       this.swapString('7', '7b', 'B3', intensity); 
+//   }
+//   if (106 <= joy_X && joy_X <= 146 && 206 <= joy_Y && joy_Y <= 246) {     // North.
+//       this.swapString('8', '8b', 'C4', intensity);
+//   }
+// }
+
 isInZone(x, y, minX, maxX, minY, maxY) {
   return minX <= x && x <= maxX && minY <= y && y <= maxY;
 }
@@ -245,6 +301,21 @@ handleNote(nun1, note, octave) {
   if (nun1.statButC == 0 && nun1.butC == 1) {
     pluckSynth.pluckSynth.triggerAttack(`${note}${octave}`);
   }
+}
+
+getRandomNote(scale) {
+  const arpeggios = {
+  C: ['C', 'E', 'G'],
+  D: ['D', 'F', 'A'],
+  E: ['E', 'G', 'B'],
+  F: ['F', 'A', 'C'],
+  G: ['G', 'B', 'D'],
+  A: ['A', 'C', 'E'],
+  B: ['B', 'D', 'F']
+  };
+  const letters = arpeggios[scale];
+  const randomIndex = Math.floor(Math.random() * letters.length);
+  return letters[randomIndex];
 }
 
 begPressC(nun1, nun2) {
@@ -282,226 +353,25 @@ begPressC(nun1, nun2) {
   nun2.statButC = nun2.butC;
 }
 
-// begPressC(nun1, nun2) {
-//   const zones = [
-//     { xRange: [106, 146], yRange: [8, 48], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C2' },
-//     { xRange: [38, 78], yRange: [38, 78], notes: ['D', 'F', 'A', 'D', 'D'], bassNote: 'D2' },
-//     { xRange: [178, 218], yRange: [36, 76], notes: ['E', 'G', 'B', 'E', 'E'], bassNote: 'E2' },
-//     { xRange: [6, 46], yRange: [106, 146], notes: ['F', 'A', 'C', 'F', 'F'], bassNote: 'F2' },
-//     { xRange: [206, 246], yRange: [106, 146], notes: ['G', 'B', 'D', 'G', 'G'], bassNote: 'G2' },
-//     { xRange: [35, 75], yRange: [186, 226], notes: ['A', 'C', 'E', 'A', 'A'], bassNote: 'A2' },
-//     { xRange: [180, 220], yRange: [186, 226], notes: ['B', 'D', 'F', 'B', 'B'], bassNote: 'B2' },
-//     { xRange: [106, 146], yRange: [206, 246], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C3' }
-//   ];
 
-//   for (const zone of zones) {
-//     if (this.isInZone(nun2.joyX, nun2.joyY, ...zone.xRange, ...zone.yRange)) {
-//       const [noteS, noteW, noteE, noteN, randomNote] = zone.notes;
-
-//       if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 8, 48)) this.handleNote(nun1, noteS, 3);
-//       else if (this.isInZone(nun1.joyX, nun1.joyY, 6, 46, 106, 146)) this.handleNote(nun1, noteW, 3);
-//       else if (this.isInZone(nun1.joyX, nun1.joyY, 206, 246, 106, 146)) this.handleNote(nun1, noteE, 3);    
-//       else if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 206, 246)) this.handleNote(nun1, noteN, 3);    // F
-//       else this.handleNote(nun1, this.getRandomNote(randomNote), 3);
-
-//       if (nun2.statButC == 0 && nun2.butC == 1) {
-//         bassPluckSynth.pluckSynth.triggerAttack(zone.bassNote);
-//       }
-//       break;
-//     }
-//   }
-
-//   // Update the button C state.
-//   nun1.statButC = nun1.butC;
-//   nun2.statButC = nun2.butC;
-// }
-
-
-// begPressC(nun1, nun2) {
-//   if (this.stringtendo) {
-//     if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {          // Bass south.
-//       // console.log("bass south");
-//       if (106 <= nun2.joyX && nun2.joyX <= 146 && 8 <= nun2.joyY && nun2.joyY <= 48) {        // South.
-//         console.log("treble south");
-//         if (nun1.statButC == 0 && nun1.butC == 1) {
-//           const intensity = this.scaleIntensity(nun2.accAvgRoc);
-//           harp.playHarp(nun2.joyX, nun2.joyY, intensity);
-//         }
-//       }
-//     }
-//   } else {
-//     // If Bass south:
-//     if (106 <= nun2.joyX && nun2.joyX <= 146 && 8 <= nun2.joyY && nun2.joyY <= 48) {                // B S (C).
-//       if (nun1.statButC == 0 && nun1.butC == 1) {
-//         if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {            // T S.
-//           pluckSynth.pluckSynth.triggerAttack('C3');
-//         }
-//         else if (6 <= nun1.joyX && nun1.joyX <= 46 && 106 <= nun1.joyY && nun1.joyY <= 146) {       // T W.
-//           pluckSynth.pluckSynth.triggerAttack('E3');
-//         }
-//         else if (206 <= nun1.joyX && nun1.joyX <= 246 && 106 <= nun1.joyY && nun1.joyY <= 146) {    // East;
-//           pluckSynth.pluckSynth.triggerAttack('G3');
-//         }
-//         else if (106 <= nun1.joyX && nun1.joyX <= 146 && 206 <= nun1.joyY && nun1.joyY <= 246) {    // T N.
-//           pluckSynth.pluckSynth.triggerAttack('C4');
-//         }
-//         else {                                                                                      // Not T NSEW.
-//           pluckSynth.pluckSynth.triggerAttack(`${this.getRandomNote('C')}3`);
-//         }
-//       }
-//       if (nun2.statButC == 0 && nun2.butC == 1) {                                                   // B C pressed.
-//         bassPluckSynth.pluckSynth.triggerAttack('C2');
-//       }
-//     } else if (38 <= nun2.joyX && nun2.joyX <= 78 && 38 <= nun2.joyY && nun2.joyY <= 78) {          // B SW.
-//       if (nun1.statButC == 0 && nun1.butC == 1) {
-//         if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {            // T S.
-//           pluckSynth.pluckSynth.triggerAttack('D3');
-//         }
-//         else if (6 <= nun1.joyX && nun1.joyX <= 46 && 106 <= nun1.joyY && nun1.joyY <= 146) {       // T W.
-//           pluckSynth.pluckSynth.triggerAttack('F3');
-//         }
-//         else if (206 <= nun1.joyX && nun1.joyX <= 246 && 106 <= nun1.joyY && nun1.joyY <= 146) {    // East;
-//           pluckSynth.pluckSynth.triggerAttack('A3');
-//         }
-//         else if (106 <= nun1.joyX && nun1.joyX <= 146 && 206 <= nun1.joyY && nun1.joyY <= 246) {    // T N.
-//           pluckSynth.pluckSynth.triggerAttack('D4');
-//         }
-//         else {                                                                                      // Not T NSEW.
-//           pluckSynth.pluckSynth.triggerAttack(`${this.getRandomNote('D')}3`);
-//         }
-//       }
-//       if (nun2.statButC == 0 && nun2.butC == 1) {                                                   // B C pressed.
-//         bassPluckSynth.pluckSynth.triggerAttack('D2');
-//       }
-//     } else if (178 <= nun2.joyX && nun2.joyX <= 218 && 36 <= nun2.joyY && nun2.joyY <= 76) {          // B SW.
-//       if (nun1.statButC == 0 && nun1.butC == 1) {
-//         if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {            // T S.
-//           pluckSynth.pluckSynth.triggerAttack('E3');
-//         }
-//         else if (6 <= nun1.joyX && nun1.joyX <= 46 && 106 <= nun1.joyY && nun1.joyY <= 146) {       // T W.
-//           pluckSynth.pluckSynth.triggerAttack('G3');
-//         }
-//         else if (206 <= nun1.joyX && nun1.joyX <= 246 && 106 <= nun1.joyY && nun1.joyY <= 146) {    // East;
-//           pluckSynth.pluckSynth.triggerAttack('B3');
-//         }
-//         else if (106 <= nun1.joyX && nun1.joyX <= 146 && 206 <= nun1.joyY && nun1.joyY <= 246) {    // T N.
-//           pluckSynth.pluckSynth.triggerAttack('E4');
-//         }
-//         else {                                                                                      // Not T NSEW.
-//           pluckSynth.pluckSynth.triggerAttack(`${this.getRandomNote('E')}3`);
-//         }
-//       }
-//       if (nun2.statButC == 0 && nun2.butC == 1) {                                                   // B C pressed.
-//         bassPluckSynth.pluckSynth.triggerAttack('E2');
-//       }
-//     } else if (6 <= nun2.joyX && nun2.joyX <= 46 && 106 <= nun2.joyY && nun2.joyY <= 146) {         // B W.
-//       if (nun1.statButC == 0 && nun1.butC == 1) {
-//         if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {            // T S.
-//           pluckSynth.pluckSynth.triggerAttack('F3');
-//         }
-//         else if (6 <= nun1.joyX && nun1.joyX <= 46 && 106 <= nun1.joyY && nun1.joyY <= 146) {       // T W.
-//           pluckSynth.pluckSynth.triggerAttack('A3');
-//         }
-//         else if (206 <= nun1.joyX && nun1.joyX <= 246 && 106 <= nun1.joyY && nun1.joyY <= 146) {    // East;
-//           pluckSynth.pluckSynth.triggerAttack('C3');
-//         }
-//         else if (106 <= nun1.joyX && nun1.joyX <= 146 && 206 <= nun1.joyY && nun1.joyY <= 246) {    // T N.
-//           pluckSynth.pluckSynth.triggerAttack('F4');
-//         }
-//         else {                                                                                      // Not T NSEW.
-//           pluckSynth.pluckSynth.triggerAttack(`${this.getRandomNote('F')}3`);
-//         }
-//       }
-//       if (nun2.statButC == 0 && nun2.butC == 1) {                                                   // B C pressed.
-//         bassPluckSynth.pluckSynth.triggerAttack('F2');
-//       }
-//     }
-//     else if (6 <= nun2.joyX && nun2.joyX <= 46 && 106 <= nun2.joyY && nun2.joyY <= 146) {           // B W.
-//       if (nun1.statButC == 0 && nun1.butC == 1) {
-//         if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {            // T S.
-//           pluckSynth.pluckSynth.triggerAttack('F3');
-//         }
-//         else if (6 <= nun1.joyX && nun1.joyX <= 46 && 106 <= nun1.joyY && nun1.joyY <= 146) {       // T W.
-//           pluckSynth.pluckSynth.triggerAttack('A3');
-//         }
-//         else if (206 <= nun1.joyX && nun1.joyX <= 246 && 106 <= nun1.joyY && nun1.joyY <= 146) {    // East;
-//           pluckSynth.pluckSynth.triggerAttack('C3');
-//         }
-//         else if (106 <= nun1.joyX && nun1.joyX <= 146 && 206 <= nun1.joyY && nun1.joyY <= 246) {    // T N.
-//           pluckSynth.pluckSynth.triggerAttack('F4');
-//         }
-//         else {                                                                                      // Not T NSEW.
-//           pluckSynth.pluckSynth.triggerAttack(`${this.getRandomNote('F')}3`);
-//         }
-//       }
-//       if (nun2.statButC == 0 && nun2.butC == 1) {                                                   // B C pressed.
-//         bassPluckSynth.pluckSynth.triggerAttack('F2');
-//       }
-//     }
-//   }
-
-//   // Update the button C state.
-//   nun1.statButC = nun1.butC;
-//   nun2.statButC = nun2.butC;
-// }
-
-getRandomNote(scale) {
-  const arpeggios = {
-  C: ['C', 'E', 'G'],
-  D: ['D', 'F', 'A'],
-  E: ['E', 'G', 'B'],
-  F: ['F', 'A', 'C'],
-  G: ['G', 'B', 'D'],
-  A: ['A', 'C', 'E'],
-  B: ['B', 'D', 'F']
-  };
-  const letters = arpeggios[scale];
-  const randomIndex = Math.floor(Math.random() * letters.length);
-  return letters[randomIndex];
-  }
-
-// begPressC(nun1, nun2) {
-//   if (nun1.statButC == 0 && nun1.butC == 1) {
-//     if (this.stringtendo) {
-//       if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {          // Bass south.
-//         console.log("bass south");
-//         if (106 <= nun2.joyX && nun2.joyX <= 146 && 8 <= nun2.joyY && nun2.joyY <= 48) {        // South.
-//           console.log("treble south");
-//           if (nun1.statButC == 0 && nun1.butC == 1) {
-//             const intensity = this.scaleIntensity(nun2.accAvgRoc);
-//             harp.playHarp(nun2.joyX, nun2.joyY, intensity);
-//           }
-//         }
-//       }
-//     } else {
-//       if (106 <= nun1.joyX && nun1.joyX <= 146 && 8 <= nun1.joyY && nun1.joyY <= 48) {        // South.
-//         console.log("bass south");
-//       }
-//     }
-//   }
-
-//   // Update the button C state.
-//   nunchuck.statButC = nunchuck.butC;
-// }
-
-  calcRateOfChange(nunchuck) {
-    const currentTime = performance.now();
-    
-    // Update initial values if 100ms has elapsed since last update
-    if (currentTime - nunchuck.lastUpdateTime >= 100) {
-      nunchuck.initAccX = nunchuck.accX;
-      nunchuck.initAccY = nunchuck.accY;
-      nunchuck.initAccZ = nunchuck.accZ;
-      nunchuck.lastUpdateTime = currentTime;
-    }
+calcRateOfChange(nunchuck) {
+  const currentTime = performance.now();
   
-    // Calculate the rate of change of all three accelerometer values
-    nunchuck.accX_RoC = (nunchuck.accX - nunchuck.initAccX);
-    nunchuck.accY_RoC = (nunchuck.accY - nunchuck.initAccY);
-    nunchuck.accZ_RoC = (nunchuck.accZ - nunchuck.initAccZ);
-    nunchuck.accAvgRoc = (nunchuck.accX_RoC + nunchuck.accY_RoC + nunchuck.accZ_RoC) / 3;
-    if (nunchuck.accAvgRoc < 0) nunchuck.accAvgRoc *= -1;
-    // console.log(nunchuck.accAvgRoc);
+  // Update initial values if 100ms has elapsed since last update
+  if (currentTime - nunchuck.lastUpdateTime >= 100) {
+    nunchuck.initAccX = nunchuck.accX;
+    nunchuck.initAccY = nunchuck.accY;
+    nunchuck.initAccZ = nunchuck.accZ;
+    nunchuck.lastUpdateTime = currentTime;
+  }
+  
+  // Calculate the rate of change of all three accelerometer values
+  nunchuck.accX_RoC = (nunchuck.accX - nunchuck.initAccX);
+  nunchuck.accY_RoC = (nunchuck.accY - nunchuck.initAccY);
+  nunchuck.accZ_RoC = (nunchuck.accZ - nunchuck.initAccZ);
+  nunchuck.accAvgRoc = (nunchuck.accX_RoC + nunchuck.accY_RoC + nunchuck.accZ_RoC) / 3;
+  if (nunchuck.accAvgRoc < 0) nunchuck.accAvgRoc *= -1;
+  // console.log(nunchuck.accAvgRoc);
   }
 
   // Scales the average rate of change of all accelerometer values

@@ -122,6 +122,7 @@ class Harp {
         // Keeps filter frequency in a suitable range.
         if (intensity < 1000) intensity = 1000;
         if (intensity > 7000) intensity = 7000;
+        console.log('test');
         if (this[`string${stringA}`].isPlaying == false) {
             this.strikeString(stringA, stringB, note, intensity);
         } else {

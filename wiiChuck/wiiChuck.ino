@@ -58,5 +58,5 @@ void loop() {
   float delayTime = SERIAL_DELAY - elapsedTime;
 
   // Delay so that data is transmitted every 17ms.
-  delay(100);
+  delay(50);
 }
