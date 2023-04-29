@@ -105,7 +105,7 @@ class Harp {
         setTimeout(() => {
             this[`string${stringA}`].playFreq(chromScale[note]);
             this[`string${stringA}`].isPlaying = true;
-        }, 25);
+        }, 50);
     }
 
     // Mutes all strings.

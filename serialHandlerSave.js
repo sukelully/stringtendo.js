@@ -45,26 +45,40 @@ class SerialHandler {
     }
 
     parseData(data) {
-        const values = data.split(',');
-        const parsedData = {
-          accelX: parseFloat(values[0]),
-          accelY: parseFloat(values[1]),
-          accelZ: parseFloat(values[2]),
-          buttonZ: parseInt(values[3]),
-          buttonC: parseInt(values[4]),
-          joyX: parseFloat(values[5]),
-          joyY: parseFloat(values[6]),
-        };
-        return parsedData;
+      const values = data.split(',');
+      const parsedData = {
+        id: values[0],
+        accelX: parseFloat(values[1]),
+        accelY: parseFloat(values[2]),
+        accelZ: parseFloat(values[3]),
+        buttonZ: parseInt(values[4]),
+        buttonC: parseInt(values[5]),
+        joyX: parseFloat(values[6]),
+        joyY: parseFloat(values[7]),
+      };
+      // console.log(parsedData);
+      return parsedData;
     }
+    
+    // parseData(data) {
+    //   const values = data.split(',');
+    //   const parsedData = {
+    //     accelX: parseFloat(values[0]),
+    //     accelY: parseFloat(values[1]),
+    //     accelZ: parseFloat(values[2]),
+    //     buttonZ: parseInt(values[3]),
+    //     buttonC: parseInt(values[4]),
+    //     joyX: parseFloat(values[5]),
+    //     joyY: parseFloat(values[6]),
+    //   };
+    //   return parsedData;
+    // }
   
     // Read data from serial port.
     async read() {
       try {
         // Read data from serial port and decode it into a string.
         const readerData = await this.reader.read();
-        // const text = this.decoder.decode(readerData.value);
-        // console.log(readerData.value);
         return readerData.value;
       } catch (err) {
         // Handle read errors.

@@ -67,7 +67,6 @@ class BassPluckSynth {
     
     // Plays notes with joystick.
     playHarp(joy_X, joy_Y) {
-        console.log("pluckSynth bass pluck");
         if (106 <= joy_X && joy_X <= 146 && 8 <= joy_Y && joy_Y <= 48) {        // South.        
             this.pluckSynth.triggerAttack('C2');
         }
