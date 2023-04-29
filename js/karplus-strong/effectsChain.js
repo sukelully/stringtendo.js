@@ -80,6 +80,7 @@ class EffectsChain {
             }
         } else {
             if (!this.filterIsConnected && !this.reverbIsConnected) {
+                inputNode.connect(outputNode);
                 this.connectNodes(inputNode, this.delay, outputNode);
             } else if (this.filterIsConnected && !this.reverbIsConnected) {
                 this.connectNodes(inputNode, this.filter, this.delay);

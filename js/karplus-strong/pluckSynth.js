@@ -1,4 +1,4 @@
-import { EffectsChain } from '/js/effectsChain.js';
+import { EffectsChain } from '/js/karplus-strong/effectsChain.js';
 
 class PluckSynth {
     constructor() {

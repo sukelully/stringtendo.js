@@ -30,13 +30,12 @@ class String {
         this.noise.connect(this.noiseFilter);
         this.pluck.connect(this.noiseFilter);
         this.noiseFilter.connect(this.gain);          
-        // this.gain.connect(this.output);          // Pluck sound
+        this.gain.connect(this.outputGain);                 // Pluck sound
         this.gain.connect(this.delay);
         this.delay.connect(this.decayGain);
         this.decayGain.connect(this.loopFilter);
         this.loopFilter.connect(this.delay);
         this.loopFilter.connect(this.outputGain);
-        // this.outputGain.connect(this.output);
     }
 
     // Clears delay loop.

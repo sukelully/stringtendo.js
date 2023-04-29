@@ -1,6 +1,6 @@
-import { String } from '/js/string.js';
-import { chromScale } from '/js/notes.js';
-import { EffectsChain } from '/js/effectsChain.js';
+import { String } from '/js/karplus-strong/string.js';
+import { chromScale } from '/js/karplus-strong/notes.js';
+import { EffectsChain } from '/js/karplus-strong/effectsChain.js';
 
 class Harp {
     constructor(){
@@ -25,11 +25,6 @@ class Harp {
         this.audioContextButton = document.getElementById('audio-context-button').addEventListener('click', async () => {
             await Tone.start();
             console.log('audio context started');
-        });
-
-        // Mute strings event listener.
-        this.muteStringsButton = document.getElementById('mute-strings-button').addEventListener('click', () => {
-            this.muteStrings();
         });
 
         // Toggle filter event listner.

@@ -1,11 +1,6 @@
-import { LineBreakTransformer } from "/js/lineBreakTransformer.js";
+import { LineBreakTransformer } from "/js/serial/lineBreakTransformer.js";
 
 class SerialHandler {
-    constructor() {
-      // Create encoder and decoder objects.
-      this.encoder = new TextEncoder();
-      this.decoder = new TextDecoder();
-    }
   
     async init() {
       // Check if serial is available.
@@ -22,10 +17,6 @@ class SerialHandler {
             const port = ports[0];
             // Open the port with the specified baud rate.
             await port.open({ baudRate: 115200 });
-  
-            // Get signal states.
-            const signals = await port.getSignals();
-            console.log(signals);
   
             const textDecoder = new TextDecoderStream();
             const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
@@ -59,20 +50,6 @@ class SerialHandler {
       // console.log(parsedData);
       return parsedData;
     }
-    
-    // parseData(data) {
-    //   const values = data.split(',');
-    //   const parsedData = {
-    //     accelX: parseFloat(values[0]),
-    //     accelY: parseFloat(values[1]),
-    //     accelZ: parseFloat(values[2]),
-    //     buttonZ: parseInt(values[3]),
-    //     buttonC: parseInt(values[4]),
-    //     joyX: parseFloat(values[5]),
-    //     joyY: parseFloat(values[6]),
-    //   };
-    //   return parsedData;
-    // }
   
     // Read data from serial port.
     async read() {

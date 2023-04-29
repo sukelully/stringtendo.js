@@ -1,6 +1,6 @@
-import { String } from '/js/string.js';
-import { chromScale } from '/js/notes.js';
-import { EffectsChain } from '/js/effectsChain.js';
+import { String } from '/js/karplus-strong/string.js';
+import { chromScale } from '/js/karplus-strong/notes.js';
+import { EffectsChain } from '/js/karplus-strong/effectsChain.js';
 
 class BassHarp {
     constructor(){
@@ -20,11 +20,6 @@ class BassHarp {
             this[`string${i}b`].outputGain.connect(this.effectsChain.reverb);
         }
         this.effectsChain.reverb.connect(this.output);
-
-        // Mute strings event listener.
-        this.muteStringsButton = document.getElementById('mute-strings-button').addEventListener('click', () => {
-            this.muteStrings();
-        });
 
         // Toggle filter event listner.
         this.toggleFilterButton = document.getElementById('toggle-filter-button').addEventListener('click', (event) => {
