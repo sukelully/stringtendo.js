@@ -111,7 +111,9 @@ class Stringtendo {
 
         // Parse each variable into variables.
         const parsedNun1 = serialHandler.parseData(data1);
+        // console.log(parsedNun1);
         const parsedNun2 = serialHandler.parseData(data2);
+        // console.log(parsedNun2);
 
         // Assign local variables to global ones.
         nun1.accX = parsedNun1.accelX;

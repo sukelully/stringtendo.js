@@ -4,7 +4,7 @@ class String {
         this.isPlaying = false;
         this.isConnected = true;
         this.noise = new Tone.Noise('brown');
-        this.pluck = new Tone.Player('/src/harpPluck.wav');
+        // this.pluck = new Tone.Player('/src/harpPluck.wav');
 
         this.decayGain = new Tone.Gain(0.999);
         this.gain = new Tone.Gain(0.4);
@@ -28,7 +28,7 @@ class String {
 
         // Routing.
         this.noise.connect(this.noiseFilter);
-        this.pluck.connect(this.noiseFilter);
+        // this.pluck.connect(this.noiseFilter);
         this.noiseFilter.connect(this.gain);          
         this.gain.connect(this.outputGain);                 // Pluck sound
         this.gain.connect(this.delay);
@@ -62,18 +62,12 @@ class String {
         const randomInt = Math.floor(Math.random() * (23 - 17) ) + 17;
 
         // Pink noise.
-        // this.noise.start();
+        this.noise.start();
         
-        // // Stop this.noise after 2-7ms.
-        // setTimeout(() => {
-        //     this.noise.stop();
-        // }, randomInt);      
-
-        // Harp sample.
-        Tone.loaded().then(() => {
-            this.pluck.start();
-        });
-        
+        // Stop this.noise after 2-7ms.
+        setTimeout(() => {
+            this.noise.stop();
+        }, randomInt);      
     }
 
     // 6000 intensity = 128 delayComp
