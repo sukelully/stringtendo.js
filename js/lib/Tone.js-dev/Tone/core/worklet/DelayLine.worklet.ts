@@ -17,32 +17,6 @@ const delayLine = /* javascript */ `
 				this.writeHead[i] = 0;
 			}
 		}
-
-		/**
-		 * Push a value onto the end
-		 * @param channel number
-		 * @param value number
-		 */
-		push(channel, value) {
-			this.writeHead[channel] += 1;
-			if (this.writeHead[channel] > this.size) {
-				this.writeHead[channel] = 0;
-			}
-			this.buffer[channel][this.writeHead[channel]] = value;
-		}
-
-		/**
-		 * Get the recorded value of the channel given the delay
-		 * @param channel number
-		 * @param delay number delay samples
-		 */
-		get(channel, delay) {
-			let readHead = this.writeHead[channel] - Math.floor(delay);
-			if (readHead < 0) {
-				readHead += this.size;
-			}
-			return this.buffer[channel][readHead];
-		}
 	}
 `;
 

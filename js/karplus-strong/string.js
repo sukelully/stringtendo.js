@@ -1,36 +1,35 @@
 class String {
     constructor(){
-        // Initialise variables for the noise generator, gain, filters, and output nodes.
+        // Initialise variables for the noise, gain, filters, and output nodes.
         this.isPlaying = false;
         this.isConnected = true;
-        this.noise = new Tone.Noise('brown');
-        // this.pluck = new Tone.Player('/src/harpPluck.wav');
-
-        this.decayGain = new Tone.Gain(0.999);
+        this.noise = new Tone.Noise('pink');
         this.gain = new Tone.Gain(0.4);
+        this.decayGain = new Tone.Gain(0.99);           // Feedback gain.
         this.outputGain = new Tone.Gain();
         
-        // Might be better at the end of the signal chain - notch filter.
-        this.noiseFilter = new Tone.Filter({            // Initial filter used to shape tone.
+        // Initial filter used to shape tone.
+        this.noiseFilter = new Tone.Filter({            
             frequency: 20000, 
             type: 'lowpass',
             Q: 1
         });
+        // Delay line.
         this.delay = new Tone.Delay({
             delayTime: 0.000865, 
             maxDelay: 1
         }); 
+        // Low-pass loop filter.
         this.loopFilter = new Tone.OnePoleFilter({
-            frequency: 2000,                            // Dampening.
+            frequency: 7000,                            // Dampening.
             type: 'lowpass'
         });
         this.output = new Tone.getDestination();
 
         // Routing.
         this.noise.connect(this.noiseFilter);
-        // this.pluck.connect(this.noiseFilter);
         this.noiseFilter.connect(this.gain);          
-        this.gain.connect(this.outputGain);                 // Pluck sound
+        this.gain.connect(this.outputGain);             // Pluck sound sent to output.
         this.gain.connect(this.delay);
         this.delay.connect(this.decayGain);
         this.decayGain.connect(this.loopFilter);
@@ -38,7 +37,7 @@ class String {
         this.loopFilter.connect(this.outputGain);
     }
 
-    // Clears delay loop.
+    // Clears feedback loop by disconnecting delay node from loop.
     muteString() {
         // Ramp output gain to 0 in 10ms.
         this.outputGain.gain.rampTo(0, 0.01);
@@ -55,25 +54,16 @@ class String {
         }, 200);
     }
 
-    // Creates a 17-22ms pink noise burst that is fed into the delay line and filter.
-    // Longer than a traditional Karplus-Strong noise burst but there are issues with
-    // it not making it into the delay line otherwise.
+    // Creates a 5-15ms pink noise burst that is fed into feedback loop.
     pluckString() {
-        const randomInt = Math.floor(Math.random() * (23 - 17) ) + 17;
-
-        // Pink noise.
+        const randomInt = Math.floor(Math.random() * (15 - 5) ) + 15;
         this.noise.start();
         
-        // Stop this.noise after 2-7ms.
+        // Stop this.noise after 5-15ms.
         setTimeout(() => {
             this.noise.stop();
         }, randomInt);      
     }
-
-    // 6000 intensity = 128 delayComp
-    // 4000 intensity = 128.5 delayComp
-    // 2000 intensity = 130 delayComp
-    // 1000 intensity = 134 delayComp
 
     // Returns a value that is used to calculate the necessary delay time
     // for the input pitch.
@@ -91,8 +81,8 @@ class String {
         }
       }
 
-    // // Plays the specified frequency.
-    // // Converts frequency to delay time.
+    // Plays the specified frequency.
+    // Converts frequency to delay time.
     playFreq(frequency) {
         const intensity = this.loopFilter.frequency;
         const delayComp = this.calcDelayComp(intensity);
@@ -101,13 +91,6 @@ class String {
         // delayTime = delayTime.toFixed(6);
         this.delay.delayTime.value = delayTime;
         this.pluckString();
-    }
-
-    // Show/hides HTML an element.
-    // Taken from https://stackoverflow.com/questions/16308779/how-can-i-hide-show-a-div-when-a-button-is-clicked
-    toggleVisibility(id) {
-        var element = document.getElementById(id);
-        element.style.display = (element.style.display == 'block') ? 'none' : 'block';
     }
 }
 

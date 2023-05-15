@@ -11,6 +11,7 @@ class Harp {
             this[`string${i}b`] = new String();
         }
         
+        // Routing.
         this.effectsChain = new EffectsChain();
         this.output = new Tone.getDestination();
 

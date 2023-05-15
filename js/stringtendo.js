@@ -71,6 +71,7 @@ class Stringtendo {
       console.error(error);
     });
 
+    // Variables mean 
     this.stringtendo = false;
     this.easyMode = true;
     this.lastExecutionTime = 0;
@@ -98,9 +99,13 @@ class Stringtendo {
           event.target.style.backgroundColor = '#b3b3b3';
       }
     });
+
+    // Spectrogram tests.
+    // document.addEventListener('mouseup', () => harp.handleMouseUp());
+    document.addEventListener('mouseup', () => pluckSynth.handleMouseUp());
   }
 
-  // Pr// Provides controller functionality.
+  // Provides controller functionality.
   // Extract controller data from serial message, listen for button presses and calculate rate of change.
   async nunchuckLoop() {
     try {
@@ -111,9 +116,7 @@ class Stringtendo {
 
         // Parse each variable into variables.
         const parsedNun1 = serialHandler.parseData(data1);
-        // console.log(parsedNun1);
         const parsedNun2 = serialHandler.parseData(data2);
-        // console.log(parsedNun2);
 
         // Assign local variables to global ones.
         nun1.accX = parsedNun1.accelX;
@@ -123,7 +126,6 @@ class Stringtendo {
         nun1.butC = parsedNun1.buttonC;
         nun1.joyX = parsedNun1.joyX;
         nun1.joyY = parsedNun1.joyY;
-        // console.log(`nun1 c: ${nun1.butC}`);
 
         nun2.accX = parsedNun2.accelX;
         nun2.accY = parsedNun2.accelY;
@@ -132,7 +134,6 @@ class Stringtendo {
         nun2.butC = parsedNun2.buttonC;
         nun2.joyX = parsedNun2.joyX;
         nun2.joyY = parsedNun2.joyY;
-        // console.log(`nun2 c: ${nun2.butC}`);
       }
 
       if (this.stringtendo) {
@@ -186,17 +187,16 @@ class Stringtendo {
     if (nunchuck.statButC == 0 && nunchuck.butC == 1) {
       // Play note on harp if C button has changed from 0 to 1.
       const intensity = this.scaleIntensity(nunchuck.accAvgRoc);
-      // console.log(`intensity: ${intensity}`)
+
       if (nunchuck == nun1) harp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);
       if (nunchuck == nun2) bassHarp.playHarp(nunchuck.joyX, nunchuck.joyY, intensity);      
-      // console.log(nunchuck.accAvgRoc);
     }
 
     // Update the button C state.
     nunchuck.statButC = nunchuck.butC;
   }
 
-  // 
+  // Select note based on nunchuck joystick position in stringtendo.
   strHandleNote(nun1, note, octave, intensity) {
     var string1;
     var string2;
@@ -237,54 +237,19 @@ class Stringtendo {
     }
   }
 
-  begStrPressC(nun1, nun2) {
-    const zones = [
-      { xRange: [106, 146], yRange: [8, 48], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C2' },
-      { xRange: [38, 78], yRange: [38, 78], notes: ['D', 'F', 'A', 'D', 'D'], bassNote: 'D2' },
-      { xRange: [178, 218], yRange: [36, 76], notes: ['E', 'G', 'B', 'E', 'E'], bassNote: 'E2' },
-      { xRange: [6, 46], yRange: [106, 146], notes: ['F', 'A', 'C', 'F', 'F'], bassNote: 'F2' },
-      { xRange: [206, 246], yRange: [106, 146], notes: ['G', 'B', 'D', 'G', 'G'], bassNote: 'G2' },
-      { xRange: [35, 75], yRange: [186, 226], notes: ['A', 'C', 'E', 'A', 'A'], bassNote: 'A2' },
-      { xRange: [180, 220], yRange: [186, 226], notes: ['B', 'D', 'F', 'B', 'B'], bassNote: 'B2' },
-      { xRange: [106, 146], yRange: [206, 246], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C3' }
-    ];
-
-    for (const zone of zones) {
-      const intensity1 = this.scaleIntensity(nun1.accAvgRoc);
-      const intensity2 = this.scaleIntensity(nun2.accAvgRoc);
-
-      if (this.isInZone(nun2.joyX, nun2.joyY, ...zone.xRange, ...zone.yRange)) {
-        const [noteS, noteW, noteE, noteN, randomNote] = zone.notes;
-
-        if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 8, 48))         this.strHandleNote(nun1, noteS, 3, intensity1);
-        else if (this.isInZone(nun1.joyX, nun1.joyY, 6, 46, 106, 146))    this.strHandleNote(nun1, noteW, 3, intensity1);
-        else if (this.isInZone(nun1.joyX, nun1.joyY, 206, 246, 106, 146)) this.strHandleNote(nun1, noteE, 3, intensity1);
-        else if (this.isInZone(nun1.joyX, nun1.joyY, 106, 146, 206, 246)) this.strHandleNote(nun1, noteN, 4, intensity1);
-        else this.strHandleNote(nun1, this.getRandomNote(randomNote), 3, intensity1);
-
-        if (nun2.statButC == 0 && nun2.butC == 1) {
-          bassHarp.playHarp(nun2.joyX, nun2.joyY, intensity2);
-          console.log(nun2.accAvgRoc);
-        }
-        break;
-      }
-    }
-
-    // Update the button C state.
-    nun1.statButC = nun1.butC;
-    nun2.statButC = nun2.butC;
-  }
-
+  // Checks location of nunchuck joystick is in range.
   isInZone(x, y, minX, maxX, minY, maxY) {
     return minX <= x && x <= maxX && minY <= y && y <= maxY;
   }
 
+  // Play note.
   handleNote(nun1, note, octave) {
     if (nun1.statButC == 0 && nun1.butC == 1) {
       pluckSynth.pluckSynth.triggerAttack(`${note}${octave}`);
     }
   }
 
+  // Get random chord tone from chosen note.
   getRandomNote(scale) {
     const arpeggios = {
     C: ['C', 'E', 'G'],
@@ -300,6 +265,8 @@ class Stringtendo {
     return letters[randomIndex];
   }
 
+  // C is pressed in beginner mode.
+  // Plays random note in chord tones.
   begPressC(nun1, nun2) {
     const zones = [
       { xRange: [106, 146], yRange: [8, 48], notes: ['C', 'E', 'G', 'C', 'C'], bassNote: 'C2' },
@@ -335,6 +302,7 @@ class Stringtendo {
     nun2.statButC = nun2.butC;
   }
 
+  // Z-button is pressed used for string mute.
   pressZ(nun1, nun2) {
     if (nun1.statButZ == 0 && nun1.butZ == 1) {
       harp.muteStrings();
@@ -343,6 +311,7 @@ class Stringtendo {
     }
   }
 
+  // Calculate rate of change of nunchuck for K-S dampening modulation.
   calcRateOfChange(nunchuck) {
     const currentTime = performance.now();
 
@@ -365,13 +334,10 @@ class Stringtendo {
 
   // Scales the average rate of change of all accelerometer values
   // to be in a suitable range for the frequency of the loop filter.
-  // High 500.
-  // Low 0.
   scaleIntensity(RoC) {
     // if (RoC < 20) RoC = 20;
     return (RoC / 500) * 8000 + 500;
   }
 }
 
-// Create nunchuck object.
 const stringtendo = new Stringtendo();

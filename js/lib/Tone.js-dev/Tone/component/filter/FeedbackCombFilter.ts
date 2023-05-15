@@ -81,7 +81,7 @@ export class FeedbackCombFilter extends ToneAudioWorklet<FeedbackCombFilterOptio
 	 */
 	static getDefaults(): FeedbackCombFilterOptions {
 		return Object.assign(ToneAudioNode.getDefaults(), {
-			delayTime: 0.1,
+			delayTime: 0.01,
 			resonance: 0.5,
 		});
 	}

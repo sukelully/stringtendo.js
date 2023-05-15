@@ -9,7 +9,9 @@ const feedbackCombFilter = /* javascript */`
 
 		constructor(options) {
 			super(options);
-			this.delayLine = new DelayLine(this.sampleRate, options.channelCount || 2);
+			this.delaySizeInSamples = Math.round(this.sampleRate / 40);	// Concert A.
+			this.delayBufferIndex = 0;
+			this.delayBuffer = new Float32Array(this.delaySizeInSamples);
 		}
 
 		static get parameterDescriptors() {
@@ -29,8 +31,11 @@ const feedbackCombFilter = /* javascript */`
 		}
 
 		generate(input, channel, parameters) {
-			const delayedSample = this.delayLine.get(channel, parameters.delayTime * this.sampleRate);
-			this.delayLine.push(channel, input + delayedSample * parameters.feedback);
+			this.delayBuffer[this.delayBufferIndex] = input + parameters.feedback * (this.delayBuffer[this.delayBufferIndex] + this.delayBuffer[(this.delayBufferIndex + 1) % this.delaySizeInSamples]) / 2;
+			const delayedSample = this.delayBuffer[this.delayBufferIndex];
+			if (++this.delayBufferIndex >= this.delaySizeInSamples) {
+				this.delayBufferIndex = 0;
+			}
 			return delayedSample;
 		}
 	}

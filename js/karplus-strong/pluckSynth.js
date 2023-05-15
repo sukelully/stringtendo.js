@@ -1,13 +1,27 @@
 import { EffectsChain } from '/js/karplus-strong/effectsChain.js';
 
-class PluckSynth {
+class MyPluckSynth {
     constructor() {
-        this.pluckSynth = new Tone.PluckSynth();
+        this.pluckSynth = new Tone.PluckSynth({
+            resonance: 0.99,
+            release: 1,
+            dampening: 4000
+        });
         this.effectsChain = new EffectsChain();
         this.output = new Tone.getDestination();
 
-        this.pluckSynth.connect(this.effectsChain.reverb);
-        this.effectsChain.reverb.connect(this.output);
+        // this.pluckSynth.connect(this.effectsChain.reverb);
+        // this.effectsChain.reverb.connect(this.output);
+        this.pluckSynth.connect(this.output);
+    }
+
+    // Runs pluckString() upon mouseup for testing.
+    handleMouseUp() {
+        this.pluckSynth.triggerAttack("C2");
+        // this.pluckSynth.triggerAttack("G3", "+2");
+        // this.pluckSynth.triggerAttack("C3", "+3");
+        // this.pluckSynth.triggerAttack("G2", "+4");
+        // this.pluckSynth.triggerAttack("C2", "+5");
     }
 
     // Plays notes with joystick.
@@ -39,6 +53,5 @@ class PluckSynth {
         }
 }
 
-const pluckSynth = new PluckSynth();
-export { PluckSynth }
+const pluckSynth = new MyPluckSynth();
 export { pluckSynth }
