@@ -2,13 +2,25 @@ import { EffectsChain } from '/js/karplus-strong/effectsChain.js';
 
 class MyPluckSynth {
     constructor() {
+        // Parameters for modified FeedbackCombFilter.worklet.
         this.pluckSynth = new Tone.PluckSynth({
             resonance: 0.99,
             release: 1,
-            dampening: 4000
+            dampening: 1000
         });
+
+        // Parameters for regular FeedbackCombFilter.worklet.
+        // this.pluckSynth = new Tone.PluckSynth({
+        //     resonance: 0.97,
+        //     release: 1,
+        //     dampening: 4000
+        // });
         this.effectsChain = new EffectsChain();
         this.output = new Tone.getDestination();
+        // Log sample rate.
+        const context = Tone.getContext();
+        const sampleRate = context.sampleRate;
+        console.log('Sample Rate:', sampleRate);
 
         // this.pluckSynth.connect(this.effectsChain.reverb);
         // this.effectsChain.reverb.connect(this.output);
@@ -17,7 +29,7 @@ class MyPluckSynth {
 
     // Runs pluckString() upon mouseup for testing.
     handleMouseUp() {
-        this.pluckSynth.triggerAttack("C2");
+        this.pluckSynth.triggerAttack("C3");
         // this.pluckSynth.triggerAttack("G3", "+2");
         // this.pluckSynth.triggerAttack("C3", "+3");
         // this.pluckSynth.triggerAttack("G2", "+4");

@@ -71,6 +71,7 @@ export class LowpassCombFilter extends ToneAudioNode<LowpassCombFilterOptions> {
 
 		// connections
 		this._lowpass.connect(this._combFilter);
+		// this._combFilter.connect(this._lowpass);
 	}
 
 	static getDefaults(): LowpassCombFilterOptions {

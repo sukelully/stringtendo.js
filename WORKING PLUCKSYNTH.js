@@ -98,24 +98,15 @@ export class PluckSynth extends Instrument<PluckSynthOptions> {
 		this._lfcf.dampening = fq;
 	}
 
-	// Modified.
-	// triggerAttack(note: Frequency, time?: Time): this {
-	// 	time = this.toSeconds(time);
-	// 	this._noise.start(time);
-	// 	this._noise.stop(time + 1/100);
-	// 	return this;
-	// }
-
-	// Standard.
 	triggerAttack(note: Frequency, time?: Time): this {
-		const freq = this.toFrequency(note);
+		// const freq = this.toFrequency(note);
 		time = this.toSeconds(time);
-		const delayAmount = 1 / freq;
-		this._lfcf.delayTime.setValueAtTime(delayAmount, time);
+		// const delayAmount = 1 / freq;
+		// this._lfcf.delayTime.setValueAtTime(delayAmount, time);
 		this._noise.start(time);
-		this._noise.stop(time + delayAmount * this.attackNoise);
-		this._lfcf.resonance.cancelScheduledValues(time);
-		this._lfcf.resonance.setValueAtTime(this.resonance, time);
+		this._noise.stop(time + 1/100);
+		// this._lfcf.resonance.cancelScheduledValues(time);
+		// this._lfcf.resonance.setValueAtTime(this.resonance, time);
 		return this;
 	}
 
