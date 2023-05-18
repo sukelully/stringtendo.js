@@ -9,12 +9,6 @@ const feedbackCombFilter = /* javascript */`
 
 		constructor(options) {
 			super(options);
-			// this.frequency = 65.41			// C2.
-			this.frequency = 130.81		// C3.
-			// this.frequency = 261.63;		// C4.
-			this.bufferIndex = 0;
-			this.bufferSize = Math.round((this.sampleRate / this.frequency) * 2);
-			// this.delayLine = new Float32Array(this.bufferSize);							// Modified.
 			this.delayLine = new DelayLine(this.sampleRate, options.channelCount || 2);			// Standard.			
 		}
 
@@ -34,37 +28,19 @@ const feedbackCombFilter = /* javascript */`
 			}];
 		}
 
-		// // Modified.
-		// generate(input, channel, parameters) {
-		// 	// Calculate delayed sample and store it
-		// 	// in the delay buffer at the current index.
-		// 	this.delayLine[this.bufferIndex] = input + parameters.feedback * (this.delayLine[this.bufferIndex] + this.delayLine[(this.bufferIndex + 1) % this.bufferSize]) / 2;
-		// 	// Retrieve delayed sample from delay buffer.
-		// 	const delayedSample = this.delayLine[this.bufferIndex];
-		// 	// Increment buffer index and handle wrapping around.
-		// 	if (++this.bufferIndex >= this.bufferSize) {
-		// 		this.bufferIndex = 0;
-		// 	}
-		// 	return delayedSample;
-		// }
-
-		// Mod standard.
 		generate(input, channel, parameters) {
+			// Calculate number of samples needed for desired pitch.
 			const sampleIndex = parameters.delayTime * this.sampleRate;
+			// Get the values of the current sample and next sample.
 			const currentSample = this.delayLine.get(channel, sampleIndex);
 			const nextSample = this.delayLine.get(channel, sampleIndex + 1);
+			// Calculate average value of both samples.
 			const average = ((currentSample + nextSample) / 2) % this.sampleRate;
-			
+
+			// Calculate value of sample to be added to delay line buffer.
 			this.delayLine.push(channel, input + average * parameters.feedback);
 			return currentSample;
 		}
-
-		// Original.
-		// generate(input, channel, parameters) {
-		// 	const delayedSample = this.delayLine.get(channel, parameters.delayTime * this.sampleRate);
-		// 	this.delayLine.push(channel, input + delayedSample * parameters.feedback);
-		// 	return delayedSample;
-		// }
 	}
 `;
 
