@@ -8,5 +8,6 @@ The Nunchuck button and accelerometer data is then sent to a PC through serial w
 
 The synthesiser itself uses a simple Karplus-Strong algorithm implemented using a modified\* version of [Tone.js]([url](https://tonejs.github.io/)https://tonejs.github.io/).
 
+<br>
 
 \* An error in the way Tone.js's FeedbackCombFilter audio node decayed. A slight modification to the source code resulted in a significant improvement to my custom synthesiser and Tone.js' own PluckSynth.
