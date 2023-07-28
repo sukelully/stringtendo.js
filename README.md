@@ -6,7 +6,7 @@ Both Nunchuks each use an [Adafruit Nunchuk adapter](https://www.adafruit.com/pr
 
 The Nunchuck button and accelerometer data is then sent to a PC through serial where it is imported into a web browser and used to control the synthesiser.
 
-The synthesiser itself uses a simple Karplus-Strong algorithm implemented using a modified\* version of [Tone.js]((https://tonejs.github.io/)https://tonejs.github.io/).
+The synthesiser itself uses a simple Karplus-Strong algorithm implemented using a modified\* version of [Tone.js](https://tonejs.github.io/).
 
 <br>
 
