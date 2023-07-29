@@ -1,6 +1,6 @@
 # stringtendo.js
 
-This project is a web-based Karplus-Strong synthesiser operated using two Nintendo Wii Nunchuck controllers.
+A web-based Karplus-Strong synthesiser operated using two Nintendo Wii Nunchuck controllers.
 
 Both Nunchuks each use an [Adafruit Nunchuk adapter](https://www.adafruit.com/product/4836) to connect to an [I2C multiplexer](https://www.adafruit.com/product/2717) which itself is connected to an [Arduino Mega 2560](https://store.arduino.cc/products/arduino-mega-2560-rev3).
 
