@@ -10,4 +10,4 @@ The synthesiser itself uses a simple Karplus-Strong algorithm implemented using 
 
 <br>
 
-\* An error in the way Tone.js's FeedbackCombFilter audio node decayed was found to be the cause of an unusual Karplus-Strong sound in its [PluckSynth](https://tonejs.github.io/docs/14.7.77/PluckSynth) module. A slight modification to the source code resulted in a significant improvement to my Karplus-Strong implementation and Tone.js' own PluckSynth.
+\* An error in the way Tone.js's [FeedbackCombFilter](https://github.com/Tonejs/Tone.js/blob/dev/Tone/component/filter/FeedbackCombFilter.ts) audio node decayed was found to be the cause of an unusual Karplus-Strong sound in its [PluckSynth](https://tonejs.github.io/docs/14.7.77/PluckSynth) module. A slight modification to the source code resulted in a significant improvement to my Karplus-Strong implementation and Tone.js' own PluckSynth.
